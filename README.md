@@ -11,7 +11,7 @@ git config --global credential.useHttpPath true
 
 ## Get started
 
- # Dive-Safe
+ # 🤿 Dive-Safe
 
  Table of Contents
 
@@ -63,11 +63,11 @@ Planned additions include:
 - Enhanced device integration (bluetooth logging, transmit to dive computers).
 
 
-## Platform support
+ ## Platform support
 
-- iOS: supported (development builds and simulator)
-- Android: supported (development builds and emulator)
-- Desktop / Web: experimental (web support via Expo web; desktop native builds TBD)
+- iOS 🍎: supported (development builds and simulator)
+- Android 🤖: supported (development builds and emulator)
+- Desktop / Web 🖥️: experimental (web support via Expo web; desktop native builds TBD)
 
 
 ## Types of support & community contributions
