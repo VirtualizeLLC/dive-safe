@@ -1,3 +1,35 @@
+## Supported Rebreathers
+
+<table>
+  <thead>
+    <tr>
+      <th align="left">Rebreather Model</th>
+      <th align="center">Assembly Guide</th>
+      <th align="center">Disassembly Guide</th>
+      <th align="center">Storage Procedure</th>
+      <th align="center">Maintenance Checklist</th>
+      <th align="center">Photos/Links</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Choptima CCR</td>
+      <td align="center">⬜ Planned</td>
+      <td align="center">⬜ Planned</td>
+      <td align="center">⬜ Planned</td>
+      <td align="center">⬜ Planned</td>
+      <td align="center">—</td>
+    </tr>
+    <tr>
+      <td><em>Your Rebreather Here</em></td>
+      <td align="center">⬜ Contribute!</td>
+      <td align="center">⬜ Contribute!</td>
+      <td align="center">⬜ Contribute!</td>
+      <td align="center">⬜ Contribute!</td>
+      <td align="center">(Add photos/links)</td>
+    </tr>
+  </tbody>
+</table>
 # 🤿 Dive-Safe
 
 An app that makes diving safer built by users and maintained by the community.
@@ -17,22 +49,28 @@ Dive-Safe is intended to be a companion application for technical diving operati
   </thead>
   <tbody>
     <tr>
-      <td>Rebreather assembly guides (Choptima CCR walkthrough)</td>
-      <td align="center">✅ Released</td>
-      <td align="center">—</td>
-      <td>Example guide and Storybook demo available</td>
+      <td>Rebreather assembly guides</td>
+      <td align="center">⬜ Planned</td>
+      <td align="center">Q4 2025</td>
+      <td>Step-by-step walkthroughs for supported models</td>
     </tr>
     <tr>
-      <td>Collapsible in-app header for switching app/Storybook</td>
-      <td align="center">✅ Released</td>
-      <td align="center">—</td>
-      <td>UX implemented; Reanimated-based version available in components</td>
+      <td>Rebreather disassembly guides</td>
+      <td align="center">⬜ Planned</td>
+      <td align="center">Q4 2025</td>
+      <td>Safe teardown and cleaning steps</td>
     </tr>
     <tr>
-      <td>Storybook integration (native & web)</td>
-      <td align="center">✅ Released</td>
-      <td align="center">—</td>
-      <td>Requires generator to detect stories; generator included</td>
+      <td>Rebreather storage procedures</td>
+      <td align="center">⬜ Planned</td>
+      <td align="center">Q1 2026</td>
+      <td>Best practices for short/long-term storage</td>
+    </tr>
+    <tr>
+      <td>Rebreather maintenance checklists</td>
+      <td align="center">⬜ Planned</td>
+      <td align="center">Q1 2026</td>
+      <td>Periodic and pre-dive maintenance workflows</td>
     </tr>
     <tr>
       <td>Per-rebreather endorsed configuration pages</td>
