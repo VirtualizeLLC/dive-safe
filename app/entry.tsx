@@ -23,8 +23,6 @@ export default function Entry() {
 
 	return (
 		<>
-			{showStorybook ? <StorybookEntry /> : <FullAppEntry />}
-
 			{/* Collapsible header */}
 			{collapsed ? (
 				<View style={styles.collapsedContainer} pointerEvents="box-none">
@@ -33,7 +31,7 @@ export default function Entry() {
 						onPress={() => setCollapsed(false)}
 						accessibilityLabel="Expand header"
 					>
-						<Text style={styles.chevron}>{'˅'}</Text>
+						<Text style={styles.chevron}>Open Debug</Text>
 					</TouchableOpacity>
 				</View>
 			) : (
@@ -45,7 +43,7 @@ export default function Entry() {
 							onPress={() => setCollapsed(true)}
 							accessibilityLabel="Collapse header"
 						>
-							<Text style={styles.collapseText}>{'˄'}</Text>
+							<Text style={styles.collapseText}>Close</Text>
 						</TouchableOpacity>
 					</View>
 
@@ -68,6 +66,7 @@ export default function Entry() {
 					</View>
 				</View>
 			)}
+			{showStorybook ? <StorybookEntry /> : <FullAppEntry />}
 		</>
 	)
 }
@@ -92,10 +91,10 @@ const styles = StyleSheet.create({
 		fontSize: 12,
 	},
 	headerContainer: {
-		position: 'absolute',
-		top: 0,
-		left: 0,
-		right: 0,
+		// position: 'absolute',
+		// top: 0,
+		// left: 0,
+		// right: 0,
 		backgroundColor: 'rgba(0,0,0,0.7)',
 		paddingTop: 36,
 		paddingBottom: 12,

@@ -107,13 +107,16 @@ export const ChoptimaStep: React.FC<Props> = ({ step, title, content, images = [
 
   const parsedContent = useMemo(() => renderMarkdown(content), [content])
 
+  const isChild = useMemo(() => Number.isNaN(Number(step)), [step])
+
   return (
+    <View>
     <View style={styles.stepContainer}>
       <TouchableOpacity
         onPress={() => setCollapsed((s) => !s)}
         style={styles.header}
         activeOpacity={0.7}
-      >
+        >
         <Text style={styles.title}>{step ? `${step}. ${title}` : title}</Text>
         <Text style={styles.chev}>{collapsed ? '+' : '-'}</Text>
       </TouchableOpacity>
@@ -127,9 +130,10 @@ export const ChoptimaStep: React.FC<Props> = ({ step, title, content, images = [
           ))}
 
           {/* Render substeps if present */}
-          {substeps.length > 0 && (
-            <View style={styles.substeps}>
-              {substeps.map((ss) => (
+        </View>
+      </Collapsible>
+    </View>
+    {substeps.length > 0 && substeps.map((ss) => (
                 <ChoptimaStep
                   key={ss.id}
                   step={ss.step}
@@ -139,11 +143,7 @@ export const ChoptimaStep: React.FC<Props> = ({ step, title, content, images = [
                   initiallyCollapsed={true}
                 />
               ))}
-            </View>
-          )}
-        </View>
-      </Collapsible>
-    </View>
+          </View>
   )
 }
 
