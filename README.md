@@ -1,35 +1,3 @@
-## Supported Rebreathers
-
-<table>
-  <thead>
-    <tr>
-      <th align="left">Rebreather Model</th>
-      <th align="center">Assembly Guide</th>
-      <th align="center">Disassembly Guide</th>
-      <th align="center">Storage Procedure</th>
-      <th align="center">Maintenance Checklist</th>
-      <th align="center">Photos/Links</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Choptima CCR</td>
-      <td align="center">⬜ Planned</td>
-      <td align="center">⬜ Planned</td>
-      <td align="center">⬜ Planned</td>
-      <td align="center">⬜ Planned</td>
-      <td align="center">—</td>
-    </tr>
-    <tr>
-      <td><em>Your Rebreather Here</em></td>
-      <td align="center">⬜ Contribute!</td>
-      <td align="center">⬜ Contribute!</td>
-      <td align="center">⬜ Contribute!</td>
-      <td align="center">⬜ Contribute!</td>
-      <td align="center">(Add photos/links)</td>
-    </tr>
-  </tbody>
-</table>
 # 🤿 Dive-Safe
 
 An app that makes diving safer built by users and maintained by the community.
@@ -106,6 +74,39 @@ Dive-Safe is intended to be a companion application for technical diving operati
 </table>
 
 This project is strictly a development-stage tool and is not certified for operational use. See the Safety & legal disclaimer below.
+
+## Supported Rebreathers
+
+<table>
+  <thead>
+    <tr>
+      <th align="left">Rebreather Model</th>
+      <th align="center">Assembly Guide</th>
+      <th align="center">Disassembly Guide</th>
+      <th align="center">Storage Procedure</th>
+      <th align="center">Maintenance Checklist</th>
+      <th align="center">Photos/Links</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Choptima CCR</td>
+      <td align="center">⬜ Planned</td>
+      <td align="center">⬜ Planned</td>
+      <td align="center">⬜ Planned</td>
+      <td align="center">⬜ Planned</td>
+      <td align="center">—</td>
+    </tr>
+    <tr>
+      <td><em>Your Rebreather Here</em></td>
+      <td align="center">⬜ Contribute!</td>
+      <td align="center">⬜ Contribute!</td>
+      <td align="center">⬜ Contribute!</td>
+      <td align="center">⬜ Contribute!</td>
+      <td align="center">(Add photos/links)</td>
+    </tr>
+  </tbody>
+</table>
 
 
 ## Platform support
