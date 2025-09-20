@@ -7,29 +7,62 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated'
 
+type Substep = {
+  id: string
+  step?: string
+  title: string
+  content?: string
+  images?: string[]
+}
+
 type Props = {
   title: string
+  step?: string
   content?: string // markdown-like
   images?: string[]
+  substeps?: Substep[]
   initiallyCollapsed?: boolean
+  expanded?: boolean // external control (e.g., expand/collapse all)
 }
 
 const Collapsible: React.FC<{ collapsed: boolean; children: React.ReactNode }> = ({ collapsed, children }) => {
-  const progress = useSharedValue(collapsed ? 0 : 1)
+  const [measuredHeight, setMeasuredHeight] = React.useState(0)
+  const animatedHeight = useSharedValue(collapsed ? 0 : measuredHeight)
 
   React.useEffect(() => {
-    progress.value = withTiming(collapsed ? 0 : 1, { duration: 220, easing: ReEasing.out(ReEasing.cubic) })
-  }, [collapsed, progress])
+    // Animate to 0 when collapsed, or to the measured content height when expanded
+    const toValue = collapsed ? 0 : measuredHeight
+    animatedHeight.value = withTiming(toValue, { duration: 220, easing: ReEasing.out(ReEasing.cubic) })
+  }, [collapsed, measuredHeight, animatedHeight])
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      opacity: progress.value,
-      transform: [{ scaleY: progress.value }],
-      // keep origin top by setting transform origin equivalent via transform
+      height: animatedHeight.value,
+      overflow: 'hidden',
+      opacity: animatedHeight.value > 0 ? 1 : 0,
     }
   })
 
-  return <Animated.View style={animatedStyle}>{children}</Animated.View>
+  return (
+    <>
+      {/* Visible animated container with constrained height */}
+      <Animated.View style={animatedStyle}>
+        {children}
+      </Animated.View>
+
+      {/* Offscreen measurement view: measures natural height of children without affecting layout */}
+      <View
+        style={styles._measure}
+        pointerEvents="none"
+        onLayout={(e) => {
+          const h = Math.round(e.nativeEvent.layout.height)
+          if (h > 0 && h !== measuredHeight) setMeasuredHeight(h)
+        }}
+      >
+        {children}
+      </View>
+    </>
+  )
 }
 
 function renderMarkdown(content?: string) {
@@ -63,8 +96,14 @@ function renderMarkdown(content?: string) {
   })
 }
 
-export const ChoptimaStep: React.FC<Props> = ({ title, content, images = [], initiallyCollapsed = true }) => {
+export const ChoptimaStep: React.FC<Props> = ({ step, title, content, images = [], substeps = [], initiallyCollapsed = true, expanded }) => {
   const [collapsed, setCollapsed] = useState(initiallyCollapsed)
+
+  // If parent provides `expanded`, sync collapsed state to that control
+  React.useEffect(() => {
+    if (expanded === undefined) return
+    setCollapsed(!expanded)
+  }, [expanded])
 
   const parsedContent = useMemo(() => renderMarkdown(content), [content])
 
@@ -75,7 +114,7 @@ export const ChoptimaStep: React.FC<Props> = ({ title, content, images = [], ini
         style={styles.header}
         activeOpacity={0.7}
       >
-        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.title}>{step ? `${step}. ${title}` : title}</Text>
         <Text style={styles.chev}>{collapsed ? '+' : '-'}</Text>
       </TouchableOpacity>
 
@@ -86,6 +125,22 @@ export const ChoptimaStep: React.FC<Props> = ({ title, content, images = [], ini
           {images.map((uri, idx) => (
             <Image key={idx} source={{ uri }} style={styles.image} resizeMode="contain" />
           ))}
+
+          {/* Render substeps if present */}
+          {substeps.length > 0 && (
+            <View style={styles.substeps}>
+              {substeps.map((ss) => (
+                <ChoptimaStep
+                  key={ss.id}
+                  step={ss.step}
+                  title={ss.title}
+                  content={ss.content}
+                  images={ss.images}
+                  initiallyCollapsed={true}
+                />
+              ))}
+            </View>
+          )}
         </View>
       </Collapsible>
     </View>
@@ -111,6 +166,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 16, fontWeight: '600' },
   chev: { fontSize: 18, fontWeight: '600', color: '#333' },
   content: { padding: 12, backgroundColor: '#fff' },
+  substeps: { marginTop: 8, paddingLeft: 12, borderLeftWidth: 2, borderLeftColor: '#eef3ff', backgroundColor: '#fbfdff', paddingVertical: 6 },
   p: { fontSize: 14, color: '#222', marginBottom: 6 },
   bullet: { fontSize: 14, color: '#222', marginBottom: 6, paddingLeft: 4 },
   h1: { fontSize: 20, fontWeight: '700', marginBottom: 6 },
@@ -118,6 +174,14 @@ const styles = StyleSheet.create({
   h3: { fontSize: 16, fontWeight: '700', marginBottom: 6 },
   inlineImage: { width: '100%', height: 180, marginVertical: 8, borderRadius: 6 },
   image: { width: '100%', height: 220, marginTop: 8, borderRadius: 6 },
+  _measure: {
+    position: 'absolute',
+    opacity: 0,
+    left: -9999,
+    top: -9999,
+    width: '100%',
+    zIndex: -9999,
+  },
 })
 
 export default ChoptimaStep

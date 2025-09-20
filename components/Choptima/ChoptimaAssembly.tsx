@@ -1,39 +1,129 @@
-import React from 'react'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import React, { useState } from 'react'
+import { ScrollView, StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import ChoptimaStep from './ChoptimaStep'
 
 type AssemblyStep = {
   id: string
+  step?: string
   title: string
   content?: string
   images?: string[]
+  children?: AssemblyStep[]
 }
 
 const sampleSteps: AssemblyStep[] = [
   {
     id: '1',
-    title: 'Unpack the Choptima CCR',
-    content: '# Unpacking\n\n- Carefully remove the unit from the case.\n- Inspect for visible damage.\n\n## What\'s in the box\n- Rebreather unit\n- Mouthpiece\n- Oxygen cylinder bracket\n\n![](https://placekitten.com/800/400)\n',
+    step: '1',
+    title: 'Clean & Dry',
+    content: '# Clean and dry\n\nIf not completed before storage: steam, rinse and clean the canister, lid, loop hoses, DSV, and counterlungs. Allow all parts to dry completely.'
   },
   {
     id: '2',
-    title: 'Attach the Oxygen Cylinder',
-    content: '## Attach the cylinder\n\n1. Ensure the cylinder valve is closed.\n2. Slide the cylinder into the bracket until it locks.\n3. Tighten the securing strap.\n\n![](https://placehold.co/800x400?text=Cylinder)\n',
+    step: '2',
+    title: 'Cylinders & Gas Analysis',
+    content: '## Cylinders & gas analysis\n\n- Fill oxygen and bailout/diluent cylinders if needed.\n- Analyze gas for O2 and He content (CO analysis recommended). Record the O2 and He percentages for main gas and any bailout cylinders.'
   },
   {
     id: '3',
-    title: 'Connect the Scrubber Canister',
-    content: '### Scrubber\n\n- Open the scrubber bay.\n- Insert the canister with the arrow pointing inward.\n- Close the bay and verify the O-ring seal.\n',
+    step: '3',
+    title: 'Canister Assembly',
+    content: '## Canister assembly\n\nPerform the following canister tasks:',
+    children: [
+      { id: '3a', step: '3a', title: 'Inspect canister, head & lid', content: 'Inspect canister, head, and lid for damage, debris, or missing hardware.' },
+      { id: '3b', step: '3b', title: 'Inspect scrubber media', content: 'Inspect scrubber media/cartridges (EAC or other sorb) and note type; if using EAC, inspect cartridges for damage and orientation.' },
+      { id: '3c', step: '3c', title: 'Pack scrubber', content: 'Pack scrubber canister, install cartridges as required and confirm orientation.' },
+      { id: '3d', step: '3d', title: 'Inspect bore plug', content: 'Inspect bore plug and confirm correct orientation.' },
+      { id: '3e', step: '3e', title: 'Lube O-rings & install head', content: 'Lube head O-rings and flat seals; confirm O-rings on premix/purge tube and install head onto canister.' },
+      { id: '3f', step: '3f', title: 'Water trap & lid', content: 'Confirm water trap is installed in lid; lube lid O-rings and flat seals and secure the lid.' },
+    ],
+  },
+  {
+    id: '4',
+    step: '4',
+    title: 'Calibration & Sensor Setup',
+    content: '## Calibration & sensor setup\n\nCalibration and sensor checks for controller and HUD.',
+    children: [
+      { id: '4a', step: '4a', title: 'Install calibration caps', content: 'Install calibration caps if required.' },
+      { id: '4b', step: '4b', title: 'Flush with O2', content: 'Connect O2 hose to controller, turn on controller, and flush with oxygen until PPO2 readings stabilize.' },
+      { id: '4c', step: '4c', title: 'Calibrate controller & HUD', content: 'Calibrate controller and HUD following manufacturer instructions.' },
+      { id: '4d', step: '4d', title: 'Record O2 sensor readings', content: 'With scrubber filled and flushed with O2, check and record O2 sensor mV readings and verify they are within expected ranges.' },
+    ],
+  },
+  {
+    id: '5',
+    step: '5',
+    title: 'Bag / Loop Setup',
+    content: '## Bag and loop setup\n\nSetup bag, hoses and routing.',
+    children: [
+      { id: '5a', step: '5a', title: 'Install water trap tubes', content: 'Install both water trap tubes into counterlungs (note black machined tube for exhale side).' },
+      { id: '5b', step: '5b', title: 'Mount scrubber', content: 'Position assembled scrubber canister into unit and secure into counterlungs/seat.' },
+      { id: '5c', step: '5c', title: 'Inspect valves & hoses', content: 'Inspect DSV, mushroom valves, mouthpiece, loop hoses, fittings and O-rings for condition.' },
+      { id: '5d', step: '5d', title: 'Stereo check', content: 'Connect DSV to loop hoses and perform stereo check to confirm flow direction.' },
+      { id: '5e', step: '5e', title: 'Connect loop hoses', content: 'Connect loop hoses to counterlungs and double-check fittings for tightness.' },
+      { id: '5f', step: '5f', title: 'Route electronics cables', content: 'Route controller and HUD cables, plug into electronics canister, and stow excess cable.' },
+    ],
+  },
+  {
+    id: '6',
+    step: '6',
+    title: 'Oxygen Cylinder & Regulator',
+    content: '## Oxygen & regulator\n\nInstall oxygen supply and regulator.',
+    children: [
+      { id: '6a', step: '6a', title: 'Attach oxygen hose & manual add', content: 'Attach oxygen supply hose to head fitting and attach manual add/override feed to MAV. Ensure inline shutoff is turned on and locked open with clip.' },
+      { id: '6b', step: '6b', title: 'Mount cylinder', content: 'Clip and tighten canister cover and mount oxygen cylinder.' },
+      { id: '6c', step: '6c', title: 'Attach regulator', content: 'Attach regulator and connect oxygen hose to the Y-block.' },
+    ],
+  },
+  {
+    id: '7',
+    step: '7',
+    title: 'Leak & Pressure Tests',
+    content: '## Leak and pressure tests\n\nPerform pressure and leak checks.',
+    children: [
+      { id: '7a', step: '7a', title: 'Negative pressure test', content: 'Ensure ADV is off and perform a negative pressure test for minimum 30s (no inward leaks).' },
+      { id: '7b', step: '7b', title: 'Positive pressure test', content: 'Ensure counterlung exhaust valve is closed and perform a positive pressure test for minimum 2 minutes (no outward leaks).' },
+      { id: '7c', step: '7c', title: 'Record cylinder pressure', content: 'Turn on oxygen and record cylinder pressure (bar).' },
+      { id: '7d', step: '7d', title: 'Leak-down check', content: 'Turn off oxygen cylinder and perform leak-down check to confirm system holds pressure.' },
+    ],
+  },
+  {
+    id: '8',
+    step: '8',
+    title: 'Pre-breathe & Final Checks',
+    content: '## Pre-breathe & final checks\n\nComplete final pre-breathe and system checks.',
+    children: [
+      { id: '8a', step: '8a', title: 'Pre-breathe', content: 'Turn oxygen back on, open counterlung exhaust valve, set setpoint (example 0.5) and perform a 5-minute pre-breathe while confirming solenoid operation and system stability.' },
+      { id: '8b', step: '8b', title: 'Confirm computers & bailout', content: 'Confirm onboard and bailout gases are configured and selected in dive computers and set to CC mode.' },
+      { id: '8c', step: '8c', title: 'Bailout checks', content: 'Check bailout regulator hoses, mouthpieces and fittings for tightness; install bailout regulators and verify operation.' },
+    ],
   },
 ]
 
 export const ChoptimaAssembly: React.FC<{ steps?: AssemblyStep[] }> = ({ steps = sampleSteps }) => {
+  const [expandAll, setExpandAll] = useState(false)
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.inner}>
-      <Text style={styles.header}>Choptima CCR Assembly Guide</Text>
+      <View style={styles.headerRow}>
+        <Text style={styles.header}>Choptima CCR Assembly Guide</Text>
+        <TouchableOpacity onPress={() => setExpandAll((v) => !v)} style={styles.toggleBtn}>
+          <Text style={styles.toggleText}>{expandAll ? 'Collapse all' : 'Expand all'}</Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.steps}>
         {steps.map((s) => (
-          <ChoptimaStep key={s.id} title={s.title} content={s.content} images={s.images} initiallyCollapsed={true} />
+          <ChoptimaStep
+            key={s.id}
+            step={s.step}
+            title={s.title}
+            content={s.content}
+            images={s.images}
+            substeps={s.children}
+            expanded={expandAll}
+            initiallyCollapsed={!expandAll}
+          />
         ))}
       </View>
     </ScrollView>

@@ -1,69 +1,151 @@
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { Image } from 'expo-image';
-import React, { useMemo, useState } from 'react';
-import { Button, StyleSheet, View } from 'react-native';
+import React from 'react'
+import FullAppEntry from './full-app-entry'
+import StorybookEntry from './storybook-entry'
+import { StyleSheet, View, TouchableOpacity, Text } from 'react-native'
 
-const NullComponent = () => null;
-
+/**
+ * Entry selects between the full app and storybook entry points.
+ * You can toggle the entry by setting `global.__SHOW_STORYBOOK = true` before the app mounts,
+ * or programmatically change which component to render here.
+ */
 export default function Entry() {
-	const [showStorybook, setShowStorybook] = useState(false)
+	// Default: show full app. Set global.__SHOW_STORYBOOK = true to show storybook instead.
+	const [showStorybook, setShowStorybook] = React.useState<boolean>(
+		(global as any).__SHOW_STORYBOOK === true
+	)
 
-	const StorybookUIRoot: any = useMemo(() => {
-		if (showStorybook) {
-			const Component = require('../../.rnstorybook/index');
-
-			console.log("DynamicRequire", Component);
-
-			return Component?.default ?? NullComponent; 
-		}
-		return NullComponent
+	// keep global flag in sync so other modules can read it if needed
+	React.useEffect(() => {
+		;(global as any).__SHOW_STORYBOOK = showStorybook === true
 	}, [showStorybook])
 
-	return showStorybook && StorybookUIRoot ? (
-		<StorybookUIRoot />
-	) : (
-		<ParallaxScrollView
-			headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-			headerImage={
-				<Image
-					source={require('@/assets/images/partial-react-logo.png')}
-					style={styles.reactLogo}
-				/>
-			}
-		>
-			<View style={styles.storybookButtons}>
-				<Button title="Open Demo (Screens)" onPress={() => setShowStorybook(true)} />
-			</View>
-			<View style={styles.storybookButtons}>
-				<Button title="Open Full App" onPress={() => setShowStorybook(true)} />
-			</View>
-		</ParallaxScrollView>
+	const [collapsed, setCollapsed] = React.useState<boolean>(false)
+
+	return (
+		<>
+			{showStorybook ? <StorybookEntry /> : <FullAppEntry />}
+
+			{/* Collapsible header */}
+			{collapsed ? (
+				<View style={styles.collapsedContainer} pointerEvents="box-none">
+					<TouchableOpacity
+						style={styles.chevronButton}
+						onPress={() => setCollapsed(false)}
+						accessibilityLabel="Expand header"
+					>
+						<Text style={styles.chevron}>{'˅'}</Text>
+					</TouchableOpacity>
+				</View>
+			) : (
+				<View style={styles.headerContainer} pointerEvents="box-none">
+					<View style={styles.headerRow}>
+						<Text style={styles.headerTitle}>Demo Controls</Text>
+						<TouchableOpacity
+							style={styles.collapseButton}
+							onPress={() => setCollapsed(true)}
+							accessibilityLabel="Collapse header"
+						>
+							<Text style={styles.collapseText}>{'˄'}</Text>
+						</TouchableOpacity>
+					</View>
+
+					<View style={styles.headerActions}>
+						<TouchableOpacity
+							style={styles.primaryButton}
+							onPress={() => setShowStorybook(false)}
+							accessibilityLabel="Show App"
+						>
+							<Text style={styles.primaryText}>Show App</Text>
+						</TouchableOpacity>
+
+						<TouchableOpacity
+							style={styles.secondaryButton}
+							onPress={() => setShowStorybook(true)}
+							accessibilityLabel="Show Demo"
+						>
+							<Text style={styles.secondaryText}>Show Demo</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
+			)}
+		</>
 	)
 }
 
 const styles = StyleSheet.create({
-	titleContainer: {
+	overlay: {
+		position: 'absolute',
+		top: 18,
+		right: 18,
+		zIndex: 9999,
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: 8,
 	},
-	stepContainer: {
-		gap: 8,
-		marginBottom: 8,
+	button: {
+		paddingVertical: 8,
+		paddingHorizontal: 12,
+		borderRadius: 8,
+		backgroundColor: 'rgba(0,0,0,0.6)',
 	},
-	reactLogo: {
-		height: 178,
-		width: 290,
-		bottom: 0,
-		left: 0,
+	buttonText: {
+		color: '#fff',
+		fontSize: 12,
+	},
+	headerContainer: {
 		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		backgroundColor: 'rgba(0,0,0,0.7)',
+		paddingTop: 36,
+		paddingBottom: 12,
+		paddingHorizontal: 16,
+		zIndex: 9999,
 	},
-	storybookButtons: {
+	headerRow: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+	},
+	headerTitle: {
+		color: '#fff',
+		fontSize: 16,
+		fontWeight: '600',
+	},
+	collapseButton: {
+		padding: 6,
+	},
+	collapseText: { color: '#fff', fontSize: 16 },
+	headerActions: {
 		marginTop: 12,
-		paddingHorizontal: 16,
+		flexDirection: 'row',
+		alignItems: 'center',
 	},
-	storybookButtonsBottom: {
-		marginVertical: 20,
-		paddingHorizontal: 16,
+	primaryButton: {
+		paddingVertical: 10,
+		paddingHorizontal: 14,
+		borderRadius: 8,
+		backgroundColor: '#ffffff',
 	},
+	primaryText: { color: '#000', fontWeight: '600' },
+	secondaryButton: {
+		marginLeft: 12,
+		paddingVertical: 10,
+		paddingHorizontal: 14,
+		borderRadius: 8,
+		backgroundColor: 'rgba(255,255,255,0.12)',
+	},
+	secondaryText: { color: '#fff', fontWeight: '600' },
+	collapsedContainer: {
+		position: 'absolute',
+		top: 18,
+		right: 18,
+		zIndex: 9999,
+	},
+	chevronButton: {
+		padding: 8,
+		backgroundColor: 'rgba(0,0,0,0.6)',
+		borderRadius: 8,
+	},
+	chevron: { color: '#fff', fontSize: 14 },
 })

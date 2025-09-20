@@ -2,7 +2,7 @@ import type { StorybookConfig } from '@storybook/react-native';
 
 const main: StorybookConfig = {
   // Glob pattern for stories located in the repository `storybook` folder
-  stories: ['../components/**/*.stories.@(js|jsx|ts|tsx)'],
+  stories: ['../components/**/*.stories.@(js|jsx|ts|tsx)', '../components/**/*.stories.tsx'],
   addons: [
     '@storybook/addon-ondevice-notes',
     '@storybook/addon-ondevice-controls',

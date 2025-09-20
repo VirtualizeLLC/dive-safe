@@ -20,7 +20,7 @@ const preview: Preview = {
 //         { name: 'cool', value: 'deepskyblue' },
 //       ],
 //     },
-//   },
+  },
 };
 
 export default preview;
