@@ -16,7 +16,7 @@ config.resolver.extraNodeModules['path'] = path.resolve(__dirname, 'rn-node-shim
 config.resolver.extraNodeModules['os'] = path.resolve(__dirname, 'rn-node-shims', 'os.js');
 
 // Ensure Metro resolves .cjs files (storybook ships some CJS files)
-config.resolver.sourceExts = Array.from(new Set([...(config.resolver.sourceExts || []), 'cjs']));
+config.resolver.sourceExts = [...Array.from(new Set([...(config.resolver.sourceExts || []), 'cjs'])), '.md'];
 
 try {
 	// prefer withStorybookConfig/withStorybook if available

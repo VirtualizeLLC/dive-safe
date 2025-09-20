@@ -6,7 +6,9 @@ import { useNavigation } from '@react-navigation/native'
 import Screen from './screens'
 import { NavigationContainer } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+
 import ChoptimaScreen from '@/components/Choptima/ChoptimaScreen'
+import ReadmeScreen from '@/components/ReadmeScreen'
 
 const Tabs = createBottomTabNavigator()
 
@@ -30,6 +32,7 @@ export default function FullAppEntry() {
       <Tabs.Navigator initialRouteName="Home">
         <Tabs.Screen name="Home" component={HomeScreen} />
         <Tabs.Screen name="Choptima" component={ChoptimaScreen} />
+        <Tabs.Screen name="Overview" component={ReadmeScreen} />
       </Tabs.Navigator>
     </NavigationContainer>
   )

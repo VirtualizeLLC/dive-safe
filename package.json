@@ -3,7 +3,7 @@
   "main": "./index.js",
   "version": "1.0.0",
   "scripts": {
-    "start": "yarn storybook:generate; expo start",
+    "start": "yarn generate-readme && yarn storybook:generate && expo start",
     "storybook:generate": "yarn storybook-generate",
     "storybook-generate": "node ./scripts/generate-story-entries.js",
     "storybook": "storybook dev -p 7007",
@@ -21,7 +21,8 @@
     "build:android:aab": "cd android && ./gradlew bundleRelease -x lint",
     "build:ios:prebuild-and-ipa": "bash -lc \"[ -d ios ] || npx expo prebuild --platform ios && xcodebuild -workspace ios/YourApp.xcworkspace -scheme YourApp -configuration Release -archivePath ios/build/YourApp.xcarchive archive && xcodebuild -exportArchive -archivePath ios/build/YourApp.xcarchive -exportOptionsPlist ios/exportOptions.plist -exportPath ios/build/YourApp.ipa\"",
     "sideload:android": "adb install -r android/app/build/outputs/apk/release/app-release.apk",
-    "sideload:ios": "echo 'Requires macOS + valid signing. Use Xcode / Apple Configurator / TestFlight to install ios/build/YourApp.ipa'"
+    "sideload:ios": "echo 'Requires macOS + valid signing. Use Xcode / Apple Configurator / TestFlight to install ios/build/YourApp.ipa'",
+    "generate-readme": "node scripts/generate-readme-ts.js"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
@@ -50,6 +51,7 @@
     "react-dom": "19.1.0",
     "react-native": "0.81.4",
     "react-native-gesture-handler": "~2.28.0",
+    "react-native-markdown-display": "^7.0.2",
     "react-native-mmkv": "^3.3.3",
     "react-native-reanimated": "~4.1.0",
     "react-native-safe-area-context": "~5.6.0",
