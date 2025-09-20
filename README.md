@@ -1,69 +1,76 @@
-# Welcome to your Expo app 👋
+# 🤿 Dive-Safe
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+An app that makes diving safer built by users and maintained by the community.
 
-## Multiple HTTPS Tokens
+## Features
 
-```
-git config --global credential.useHttpPath true
-```
+Dive-Safe is intended to be a companion application for technical diving operations. Below is a concise feature matrix showing current, unreleased, and planned work with an ETA and short notes.
 
-
-## Get started
-
- # 🤿 Dive-Safe
-
- Table of Contents
-
- - [Scope of the app](#scope-of-the-app)
- - [Current features](#current-features)
- - [Upcoming features](#upcoming-features)
- - [Platform support](#platform-support)
- - [Types of support & community contributions](#types-of-support--community-contributions)
-   - [In-depth rebreather setup guides](#in-depth-rebreather-setup-guides)
-   - [Endorsements and community comments](#endorsements-and-community-comments)
- - [Safety & legal disclaimer](#safety--legal-disclaimer)
- - [How to help / Contributing](#how-to-help--contributing)
- - [Contact / License](#contact--license)
- - [Development](./docs/development.md)
-   - [Getting started](./docs/development.md#getting-started)
-   - [Development workflow](./docs/development.md#development-workflow)
-   - [Storybook and UI testing](./docs/development.md#storybook-and-ui-testing)
-
-
-
-## Scope of the app
-
-Dive-Safe is intended to be a companion application for technical diving operations. Its focus is to provide:
-
-- Guided procedures for complex rebreather setups and maintenance.
-- Checklists and step-by-step assembly/disassembly guides.
-- Safety reminders and community-shared configuration notes.
-- Offline-friendly reference materials for dive teams.
+<table>
+  <thead>
+    <tr>
+      <th align="left">Feature</th>
+      <th align="center">Status</th>
+      <th align="center">ETA</th>
+      <th align="left">Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Rebreather assembly guides (Choptima CCR walkthrough)</td>
+      <td align="center">✅ Released</td>
+      <td align="center">—</td>
+      <td>Example guide and Storybook demo available</td>
+    </tr>
+    <tr>
+      <td>Collapsible in-app header for switching app/Storybook</td>
+      <td align="center">✅ Released</td>
+      <td align="center">—</td>
+      <td>UX implemented; Reanimated-based version available in components</td>
+    </tr>
+    <tr>
+      <td>Storybook integration (native & web)</td>
+      <td align="center">✅ Released</td>
+      <td align="center">—</td>
+      <td>Requires generator to detect stories; generator included</td>
+    </tr>
+    <tr>
+      <td>Per-rebreather endorsed configuration pages</td>
+      <td align="center">⬜ Unreleased</td>
+      <td align="center">Q4 2025</td>
+      <td>Requires endorsement workflow and moderation tools</td>
+    </tr>
+    <tr>
+      <td>Community comment & endorsement system</td>
+      <td align="center">⬜ Planned</td>
+      <td align="center">Q1 2026</td>
+      <td>Moderation and identity verification needed</td>
+    </tr>
+    <tr>
+      <td>Offline encrypted storage (MMKV)</td>
+      <td align="center">⬜ Planned</td>
+      <td align="center">Q1 2026</td>
+      <td>For sensitive configs and offline use</td>
+    </tr>
+    <tr>
+      <td>Export/import validated checklists</td>
+      <td align="center">⬜ Planned</td>
+      <td align="center">Q2 2026</td>
+      <td>CSV/JSON and import validation</td>
+    </tr>
+    <tr>
+      <td>Device integration (Bluetooth logging)</td>
+      <td align="center">⬜ Planned</td>
+      <td align="center">2026+</td>
+      <td>Long-term roadmap; requires hardware partners</td>
+    </tr>
+  </tbody>
+</table>
 
 This project is strictly a development-stage tool and is not certified for operational use. See the Safety & legal disclaimer below.
 
 
-## Current features
-
-- Rebreather assembly guides (example: Choptima CCR assembly walkthrough).
-- UI scaffolding with Expo and Storybook for component-driven development.
-- A collapsible in-app header to switch between the full app and Storybook/demo view.
-- Basic navigation and a modular component structure.
-
-
-## Upcoming features
-
-Planned additions include:
-
-- Per-rebreather endorsed configuration pages with step-by-step checklists.
-- Community comment and endorsement system (moderated contributions).
-- Offline caching and encrypted storage of critical configs (MMKV integration).
-- Export/import of validated assembly checklists.
-- Enhanced device integration (bluetooth logging, transmit to dive computers).
-
-
- ## Platform support
+## Platform support
 
 - iOS 🍎: supported (development builds and simulator)
 - Android 🤖: supported (development builds and emulator)
@@ -88,7 +95,6 @@ We plan to support several structured contribution types so divers and technical
 
 - Community members will be able to comment on guides and submit suggestions.
 - Endorsements will be available for qualified contributors; endorsement criteria and the reviewer workflow will be defined before endorsements are published.
-
 
 ## Safety & legal disclaimer
 
