@@ -1,6 +1,6 @@
 {
   "name": "dive-safe",
-  "main": "expo-router/entry",
+  "main": "./app/entry",
   "version": "1.0.0",
   "scripts": {
     "start": "yarn storybook:generate; expo start",

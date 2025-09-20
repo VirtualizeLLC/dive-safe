@@ -5,7 +5,7 @@ import { Button, StyleSheet, View } from 'react-native';
 
 const NullComponent = () => null;
 
-export default function HomeScreen() {
+export default function Entry() {
 	const [showStorybook, setShowStorybook] = useState(false)
 
 	const StorybookUIRoot: any = useMemo(() => {
