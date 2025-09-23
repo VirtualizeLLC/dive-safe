@@ -11,7 +11,7 @@ type AssemblyStep = {
   children?: AssemblyStep[]
 }
 
-const sampleSteps: AssemblyStep[] = [
+export const sampleSteps: AssemblyStep[] = [
   {
     id: '1',
     step: '1',
@@ -86,6 +86,8 @@ const sampleSteps: AssemblyStep[] = [
   { id: '8a', step: '8a', title: 'Pre-breathe', content: 'Turn oxygen back on, open counterlung exhaust valve, set setpoint (example 0.5) and perform a 5-minute pre-breathe while confirming solenoid operation and system stability.' },
   { id: '8b', step: '8b', title: 'Confirm computers & bailout', content: 'Confirm onboard and bailout gases are configured and selected in dive computers and set to CC mode.' },
   { id: '8c', step: '8c', title: 'Bailout checks', content: 'Check bailout regulator hoses, mouthpieces and fittings for tightness; install bailout regulators and verify operation.' },
+  // Placeholder disassembly step
+  { id: 'D1', step: 'D1', title: 'Disassembly / Storage', content: 'Placeholder: Steps for safely disassembling, cleaning, and storing the Choptima after use. Include drying, depressurizing cylinders, and packing procedures.' },
 ]
 
 export const ChoptimaAssembly: React.FC<{ steps?: AssemblyStep[] }> = ({ steps = sampleSteps }) => {

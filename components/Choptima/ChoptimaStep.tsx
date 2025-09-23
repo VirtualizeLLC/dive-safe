@@ -23,6 +23,7 @@ type Props = {
   substeps?: Substep[]
   initiallyCollapsed?: boolean
   expanded?: boolean // external control (e.g., expand/collapse all)
+  leftAccessory?: React.ReactNode
 }
 
 const Collapsible: React.FC<{ collapsed: boolean; children: React.ReactNode }> = ({ collapsed, children }) => {
@@ -96,7 +97,7 @@ function renderMarkdown(content?: string) {
   })
 }
 
-export const ChoptimaStep: React.FC<Props> = ({ step, title, content, images = [], substeps = [], initiallyCollapsed = true, expanded }) => {
+export const ChoptimaStep: React.FC<Props> = ({ step, title, content, images = [], substeps = [], initiallyCollapsed = true, expanded, leftAccessory }) => {
   const [collapsed, setCollapsed] = useState(initiallyCollapsed)
 
   // If parent provides `expanded`, sync collapsed state to that control
@@ -112,14 +113,17 @@ export const ChoptimaStep: React.FC<Props> = ({ step, title, content, images = [
   return (
     <View>
     <View style={styles.stepContainer}>
-      <TouchableOpacity
-        onPress={() => setCollapsed((s) => !s)}
-        style={styles.header}
-        activeOpacity={0.7}
+      <View style={styles.header}>
+        {leftAccessory ? <View style={styles.leftAccessory}>{leftAccessory}</View> : null}
+        <TouchableOpacity
+          onPress={() => setCollapsed((s) => !s)}
+          style={styles.headerContent}
+          activeOpacity={0.7}
         >
-        <Text style={styles.title}>{step ? `${step}. ${title}` : title}</Text>
-        <Text style={styles.chev}>{collapsed ? '+' : '-'}</Text>
-      </TouchableOpacity>
+          <Text style={styles.title}>{step ? `${step}. ${title}` : title}</Text>
+          <Text style={styles.chev}>{collapsed ? '+' : '-'}</Text>
+        </TouchableOpacity>
+      </View>
 
       <Collapsible collapsed={collapsed}>
         <View style={styles.content}>
@@ -159,9 +163,18 @@ const styles = StyleSheet.create({
   header: {
     padding: 12,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#f7f7f7',
+  },
+  headerContent: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  leftAccessory: {
+    marginRight: 8,
+    zIndex: 2,
   },
   title: { fontSize: 16, fontWeight: '600' },
   chev: { fontSize: 18, fontWeight: '600', color: '#333' },
