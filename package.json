@@ -22,7 +22,8 @@
     "build:ios:prebuild-and-ipa": "bash -lc \"[ -d ios ] || npx expo prebuild --platform ios && xcodebuild -workspace ios/YourApp.xcworkspace -scheme YourApp -configuration Release -archivePath ios/build/YourApp.xcarchive archive && xcodebuild -exportArchive -archivePath ios/build/YourApp.xcarchive -exportOptionsPlist ios/exportOptions.plist -exportPath ios/build/YourApp.ipa\"",
     "sideload:android": "adb install -r android/app/build/outputs/apk/release/app-release.apk",
     "sideload:ios": "echo 'Requires macOS + valid signing. Use Xcode / Apple Configurator / TestFlight to install ios/build/YourApp.ipa'",
-    "generate-readme": "node scripts/generate-readme-ts.js"
+    "generate-readme": "node scripts/generate-readme-ts.js",
+    "github:upload-apk": "node ./scripts/upload-apk.js"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
