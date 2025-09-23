@@ -1,7 +1,7 @@
 {
   "name": "dive-safe",
   "main": "./index.js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "start": "yarn generate-readme && yarn storybook:generate && expo start",
     "storybook:generate": "yarn storybook-generate",
