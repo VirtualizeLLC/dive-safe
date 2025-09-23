@@ -48,6 +48,42 @@ const AssemblyChecklist: React.FC = () => {
   )
 }
 
+// Update AssemblyChecklist to accept expandAll prop so parent can control expansion
+interface AssemblyChecklistProps { expandAll?: boolean }
+const AssemblyChecklistControlled: React.FC<AssemblyChecklistProps> = ({ expandAll }) => {
+  const [checked, setChecked] = useState<{ [id: string]: boolean }>({});
+
+  const handleToggle = (id: string) => {
+    setChecked((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  return (
+    <ScrollView style={styles.checklistContainer} contentContainerStyle={styles.inner}>
+      <Text style={styles.header}>Choptima CCR Assembly Checklist</Text>
+      {sampleSteps.map((step) => (
+        <ChoptimaStep
+          key={step.id}
+          step={step.step}
+          title={step.title}
+          content={step.content}
+          images={step.images}
+          leftAccessory={(
+            <TouchableOpacity
+              onPress={() => handleToggle(step.id)}
+              style={[styles.checkbox, checked[step.id] && styles.checkboxChecked]}
+              activeOpacity={0.7}
+            >
+              {checked[step.id] && <Text style={styles.checkboxMark}>✓</Text>}
+            </TouchableOpacity>
+          )}
+          expanded={expandAll}
+          initiallyCollapsed={!expandAll}
+        />
+      ))}
+    </ScrollView>
+  )
+}
+
 const DiagramsPlaceholder: React.FC = () => (
   <View style={styles.placeholder}>
     <Text style={styles.placeholderText}>Diagrams and annotated images go here.</Text>
@@ -57,6 +93,7 @@ const DiagramsPlaceholder: React.FC = () => (
 export const ChoptimaScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'assembly' | 'disassembly' | 'diagrams'>('assembly');
   const [checklistMode, setChecklistMode] = useState(false);
+  const [expandAll, setExpandAll] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -70,19 +107,30 @@ export const ChoptimaScreen: React.FC = () => {
       {/* Controls that sit under the tabs (e.g., checklist toggle for Assembly) */}
       <View style={styles.tabControlsRow}>
         {activeTab === 'assembly' && (
-          <TouchableOpacity
-            style={[styles.toggleChecklistBtn, checklistMode && styles.toggleChecklistBtnActive]}
-            onPress={() => setChecklistMode((v) => !v)}
-          >
-            <Text style={[styles.toggleChecklistText, checklistMode && styles.toggleChecklistTextActive]}>
-              {checklistMode ? 'Checklist: ON' : 'Checklist: OFF'}
-            </Text>
-          </TouchableOpacity>
+          <>
+            <TouchableOpacity
+              style={[styles.toggleChecklistBtn, checklistMode && styles.toggleChecklistBtnActive]}
+              onPress={() => setChecklistMode((v) => !v)}
+            >
+              <Text style={[styles.toggleChecklistText, checklistMode && styles.toggleChecklistTextActive]}>
+                {checklistMode ? 'Checklist: ON' : 'Checklist: OFF'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.toggleChecklistBtn, expandAll && styles.toggleChecklistBtnActive, { marginLeft: 10 }]}
+              onPress={() => setExpandAll((v) => !v)}
+            >
+              <Text style={[styles.toggleChecklistText, expandAll && styles.toggleChecklistTextActive]}>
+                {expandAll ? 'Collapse all' : 'Expand all'}
+              </Text>
+            </TouchableOpacity>
+          </>
         )}
       </View>
 
       <View style={styles.content}>
-        {activeTab === 'assembly' && (checklistMode ? <AssemblyChecklist /> : <ChoptimaAssembly />)}
+  {activeTab === 'assembly' && (checklistMode ? <AssemblyChecklistControlled expandAll={expandAll} /> : <ChoptimaAssembly expandAll={expandAll} hideHeaderToggle />)}
         {activeTab === 'disassembly' && (
           <View style={styles.placeholder}>
             <Text style={styles.placeholderText}>Disassembly steps not yet authored.</Text>
@@ -102,7 +150,7 @@ const styles = StyleSheet.create({
   tabText: { color: '#333', fontWeight: '600' },
   tabTextActive: { color: '#fff' },
   toggleRow: { flexDirection: 'row', justifyContent: 'flex-end', padding: 8, backgroundColor: '#f7f7f7' },
-  toggleChecklistBtn: { paddingVertical: 6, paddingHorizontal: 14, borderRadius: 6, backgroundColor: '#e6e6e6' },
+  toggleChecklistBtn: { alignSelf: 'flex-start', paddingVertical: 2, paddingHorizontal: 10, borderRadius: 6, backgroundColor: '#e6e6e6', marginRight: 8, height: 32, justifyContent: 'center', alignItems: 'center' },
   toggleChecklistBtnActive: { backgroundColor: '#0a84ff' },
   toggleChecklistText: { color: '#333', fontWeight: '600' },
   toggleChecklistTextActive: { color: '#fff' },
@@ -123,7 +171,7 @@ const styles = StyleSheet.create({
   checklistTextChecked: { color: '#aaa', textDecorationLine: 'line-through' },
   headerRowSingle: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 12 },
   headerTitle: { fontSize: 18, fontWeight: '700' },
-  tabControlsRow: { paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#fafafa', borderBottomWidth: 1, borderBottomColor: '#eee' },
+  tabControlsRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 6, backgroundColor: 'transparent', borderBottomWidth: 1, borderBottomColor: '#eee' },
 });
 
 export default ChoptimaScreen

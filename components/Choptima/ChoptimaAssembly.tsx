@@ -90,16 +90,26 @@ export const sampleSteps: AssemblyStep[] = [
   { id: 'D1', step: 'D1', title: 'Disassembly / Storage', content: 'Placeholder: Steps for safely disassembling, cleaning, and storing the Choptima after use. Include drying, depressurizing cylinders, and packing procedures.' },
 ]
 
-export const ChoptimaAssembly: React.FC<{ steps?: AssemblyStep[] }> = ({ steps = sampleSteps }) => {
-  const [expandAll, setExpandAll] = useState(false)
+export const ChoptimaAssembly: React.FC<{ steps?: AssemblyStep[]; expandAll?: boolean; onToggleExpandAll?: (v: boolean) => void; hideHeaderToggle?: boolean }> = ({ steps = sampleSteps, expandAll, onToggleExpandAll, hideHeaderToggle }) => {
+  const [localExpandAll, setLocalExpandAll] = useState(false)
+
+  const actualExpandAll = typeof expandAll === 'boolean' ? expandAll : localExpandAll
+
+  const handleToggle = () => {
+    const next = !actualExpandAll
+    if (onToggleExpandAll) onToggleExpandAll(next)
+    else setLocalExpandAll(next)
+  }
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.inner}>
       <View style={styles.headerRow}>
         <Text style={styles.header}>Choptima CCR Assembly Guide</Text>
-        <TouchableOpacity onPress={() => setExpandAll((v) => !v)} style={styles.toggleBtn}>
-          <Text style={styles.toggleText}>{expandAll ? 'Collapse all' : 'Expand all'}</Text>
-        </TouchableOpacity>
+        {!hideHeaderToggle && (
+          <TouchableOpacity onPress={handleToggle} style={styles.toggleBtn}>
+            <Text style={styles.toggleText}>{actualExpandAll ? 'Collapse all' : 'Expand all'}</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <View style={styles.steps}>
@@ -110,8 +120,8 @@ export const ChoptimaAssembly: React.FC<{ steps?: AssemblyStep[] }> = ({ steps =
             title={s.title}
             content={s.content}
             images={s.images}
-            expanded={expandAll}
-            initiallyCollapsed={!expandAll}
+            expanded={actualExpandAll}
+            initiallyCollapsed={!actualExpandAll}
           />
         ))}
       </View>
