@@ -1,4 +1,5 @@
-import { memo, useCallback, useMemo, useRef, useState } from 'react'
+import { DateTime } from 'luxon'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { GestureResponderEvent } from 'react-native'
 import {
 	Alert,
@@ -20,8 +21,7 @@ type Props = {
 	onToggleChecklist: () => void
 	expandAll: boolean
 	onToggleExpandAll: () => void
-	setExpandAll: (v: boolean) => void
-	setChecklistMode: (v: boolean) => void
+	// removed unused setters; use onToggleChecklist/onToggleExpandAll callbacks
 	onTogglePin?: (actionId: string) => void
 }
 
@@ -30,15 +30,12 @@ const ActionsMenu: React.FC<Props> = memo(
 		checklistMode,
 		onToggleChecklist,
 		expandAll,
-		setExpandAll,
-		setChecklistMode,
 		onToggleExpandAll,
 		onTogglePin,
 	}) => {
 		const [showSnapshots, setShowSnapshots] = useState(false)
 		const [visible, setVisible] = useState(false)
 		const [editing, setEditing] = useState(false)
-		const [nameInput, setNameInput] = useState('')
 
 		const saveSnapshot = useChoptimaStore((s) => s.saveSnapshot)
 		const loadedSnapshotName = useChoptimaStore((s) => s.loadedSnapshotName)
@@ -46,19 +43,25 @@ const ActionsMenu: React.FC<Props> = memo(
 			(s) => s.setLoadedSnapshotName,
 		)
 
+		const saveName = useMemo(() => {
+			if (loadedSnapshotName) return loadedSnapshotName.replace(/_/g, ' ')
+			return DateTime.now().toFormat('yyyy-LL-dd_HH:mm')
+		}, [loadedSnapshotName])
+
+		const nameInput = useRef(saveName)
+
 		const handleSave = useCallback(() => {
-			console.log('Saving snapshot...')
-			saveSnapshot()
+			saveSnapshot(nameInput.current?.trim() || undefined)
 		}, [saveSnapshot])
 		const pinnedActions = useChoptimaStore((s) => s.pinnedActions)
 
-		const saveName = useMemo(
-			() =>
-				loadedSnapshotName
-					? loadedSnapshotName.replace(/_/g, ' ')
-					: new Date().toISOString(),
-			[loadedSnapshotName],
-		)
+		const setNameInput = useCallback((val: string) => {
+			nameInput.current = val
+		}, [])
+
+		useEffect(() => {
+			setNameInput(saveName)
+		}, [saveName, setNameInput])
 
 		return (
 			<View
@@ -241,7 +244,7 @@ const ActionsMenu: React.FC<Props> = memo(
 						{pinnedActions?.includes('toggle_checklist') && (
 							<IconBtn
 								name="checkmark.square.fill"
-								onPress={() => setChecklistMode((v) => !v)}
+								onPress={onToggleChecklist}
 								onLongPress={() => Alert.alert('Toggle checklist')}
 								accessibilityLabel="Toggle checklist"
 							/>
@@ -249,7 +252,7 @@ const ActionsMenu: React.FC<Props> = memo(
 						{pinnedActions?.includes('toggle_expand') && (
 							<IconBtn
 								name="chevron.down"
-								onPress={() => setExpandAll((v) => !v)}
+								onPress={onToggleExpandAll}
 								onLongPress={() => Alert.alert('Toggle expand/collapse')}
 								accessibilityLabel="Toggle expand/collapse"
 							/>
@@ -278,17 +281,16 @@ const ActionsMenu: React.FC<Props> = memo(
 					{editing ? (
 						<>
 							<TextInput
-								value={saveName}
 								onChangeText={setNameInput}
 								placeholder="Sheet name"
-								defaultValue={Date.now().toString()}
+								defaultValue={saveName}
 								style={styles.nameInput}
 							/>
 							<View style={styles.renameActions}>
 								<TouchableOpacity
 									style={styles.renameBtn}
 									onPress={() => {
-										const name = nameInput.trim() || undefined
+										const name = nameInput.current?.trim() || undefined
 										saveSnapshot(name)
 										setLoadedSnapshotName(
 											name ? name.replace(/\s+/g, '_') : undefined,
@@ -337,8 +339,11 @@ const ActionsMenu: React.FC<Props> = memo(
 ActionsMenu.displayName = 'ActionsMenu'
 
 const styles = StyleSheet.create({
-	pinnedScroll: { flex: 1 },
-	pinnedRow: { alignItems: 'center' },
+	pinnedScroll: { flex: 1, minWidth: '100%' },
+	pinnedRow: {
+		alignItems: 'center',
+		width: '100%',
+	},
 	menuContent: { width: 260 },
 	actionsSeparator: {
 		width: 1,
@@ -369,7 +374,7 @@ const styles = StyleSheet.create({
 		marginLeft: 8,
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: 8,
+		// gap not supported in RN; use spacing on children instead
 	},
 	nameInput: {
 		minWidth: 180,

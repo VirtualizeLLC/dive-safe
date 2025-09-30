@@ -60,8 +60,6 @@ export const ChoptimaScreen: React.FC = memo(() => {
 								checklistMode={checklistMode}
 								onToggleChecklist={() => setChecklistMode((v) => !v)}
 								expandAll={expandAll}
-								setExpandAll={setExpandAll}
-								setChecklistMode={setChecklistMode}
 								onToggleExpandAll={() => setExpandAll((v) => !v)}
 								onTogglePin={(actionId: string) => togglePinnedAction(actionId)}
 							/>

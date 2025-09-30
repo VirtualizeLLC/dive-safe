@@ -134,7 +134,7 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 			if (typeof loader === 'function') {
 				loader()
 			}
-		} catch (e) {
+		} catch {
 			// ignore
 		}
 	},
