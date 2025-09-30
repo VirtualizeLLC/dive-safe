@@ -1,9 +1,9 @@
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import FullAppEntry from './full-app-entry'
-import StorybookEntry from './storybook-entry'
-import { withRootProviders } from './hocs/withRootProviders'
 import withHocs from './hocs'
+import { withRootProviders } from './hocs/withRootProviders'
+import StorybookEntry from './storybook-entry'
 
 /**
  * Entry selects between the full app and storybook entry points.
@@ -13,12 +13,14 @@ import withHocs from './hocs'
 const Entry = () => {
 	// Default: show full app. Set global.__SHOW_STORYBOOK = true to show storybook instead.
 	const [showStorybook, setShowStorybook] = React.useState<boolean>(
-		((global as unknown) as { __SHOW_STORYBOOK?: boolean }).__SHOW_STORYBOOK === true,
+		(global as unknown as { __SHOW_STORYBOOK?: boolean }).__SHOW_STORYBOOK ===
+			true,
 	)
 
 	// keep global flag in sync so other modules can read it if needed
 	React.useEffect(() => {
-		;(((global as unknown) as { __SHOW_STORYBOOK?: boolean }).__SHOW_STORYBOOK = showStorybook === true)
+		;(global as unknown as { __SHOW_STORYBOOK?: boolean }).__SHOW_STORYBOOK =
+			showStorybook === true
 	}, [showStorybook])
 
 	const [collapsed, setCollapsed] = React.useState<boolean>(false)
