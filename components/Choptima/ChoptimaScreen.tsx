@@ -1,24 +1,9 @@
 import type React from 'react'
-import { memo, useCallback, useEffect, useRef, useState } from 'react'
-import {
-	Alert,
-	Pressable,
-	ScrollView,
-	StyleSheet,
-	Text,
-	TouchableOpacity,
-	View,
-} from 'react-native'
-import { ChecklistStorage } from '@/app/storage/ChecklistStorage'
-import SnapshotExplorer from '@/components/Snapshots/SnapshotExplorer'
-import { IconButton } from '@/components/ui/IconButton'
+import { memo, useEffect, useState } from 'react'
+import { StyleSheet, Text, View } from 'react-native'
 import ActionsMenu from './ActionsMenu'
-import AssemblyChecklist, {
-	AssemblyChecklistControlled,
-} from './AssemblyChecklist'
-import CheckboxInternalState from './CheckboxInternalState'
+import { AssemblyChecklistControlled } from './AssemblyChecklist'
 import ChoptimaAssembly from './ChoptimaAssembly'
-import ChoptimaStep from './ChoptimaStep'
 import DiagramsPlaceholder from './DiagramsPlaceholder'
 import TabButton from './TabButton'
 import useChoptimaStore from './useChoptimaStore'
@@ -29,7 +14,6 @@ export const ChoptimaScreen: React.FC = memo(() => {
 	>('assembly')
 	const [checklistMode, setChecklistMode] = useState(false)
 	const [expandAll, setExpandAll] = useState(false)
-	const [showSnapshots, setShowSnapshots] = useState(false)
 	// pinned actions persisted in store
 	const pinnedActions = useChoptimaStore((s) => s.pinnedActions)
 	const togglePinnedAction = useChoptimaStore((s) => s.togglePinnedAction)
@@ -38,15 +22,13 @@ export const ChoptimaScreen: React.FC = memo(() => {
 	// initialize persisted pinned actions when this screen mounts
 	useEffect(() => {
 		loadPinnedActions()
+		// debug: log pinned actions after attempting to load
+		console.log('ChoptimaScreen: called loadPinnedActions')
 	}, [loadPinnedActions])
-	const saveSnapshot = useChoptimaStore((s) => s.saveSnapshot)
 
-	const handleSave = useCallback(() => {
-		console.log('Saving snapshot...')
-		// create a name that the snapshot explorer can parse easily
-		// call without a name so the store will use the 'checklist:snapshot:ISO' key format
-		saveSnapshot()
-	}, [saveSnapshot])
+	useEffect(() => {
+		console.log('ChoptimaScreen: pinnedActions changed ->', pinnedActions)
+	}, [pinnedActions])
 
 	return (
 		<>
@@ -78,56 +60,11 @@ export const ChoptimaScreen: React.FC = memo(() => {
 								checklistMode={checklistMode}
 								onToggleChecklist={() => setChecklistMode((v) => !v)}
 								expandAll={expandAll}
+								setExpandAll={setExpandAll}
+								setChecklistMode={setChecklistMode}
 								onToggleExpandAll={() => setExpandAll((v) => !v)}
-								onSave={handleSave}
-								onOpenSnapshots={() => setShowSnapshots(true)}
-								pinnedActions={pinnedActions}
 								onTogglePin={(actionId: string) => togglePinnedAction(actionId)}
 							/>
-
-							{/* separator */}
-							<View style={styles.actionsSeparator} />
-
-							{/* horizontally scrollable pinned actions */}
-							<ScrollView
-								horizontal
-								showsHorizontalScrollIndicator={false}
-								contentContainerStyle={styles.pinnedRow}
-								style={styles.pinnedScroll}
-							>
-								{pinnedActions.includes('toggle_checklist') && (
-									<IconButton
-										name="checkmark.square.fill"
-										onPress={() => setChecklistMode((v) => !v)}
-										onLongPress={() => Alert.alert('Toggle checklist')}
-										accessibilityLabel="Toggle checklist"
-									/>
-								)}
-								{pinnedActions.includes('toggle_expand') && (
-									<IconButton
-										name="chevron.down"
-										onPress={() => setExpandAll((v) => !v)}
-										onLongPress={() => Alert.alert('Toggle expand/collapse')}
-										accessibilityLabel="Toggle expand/collapse"
-									/>
-								)}
-								{pinnedActions.includes('save') && (
-									<IconButton
-										name="square.and.arrow.down"
-										onPress={handleSave}
-										onLongPress={() => Alert.alert('Save snapshot')}
-										accessibilityLabel="Save snapshot"
-									/>
-								)}
-								{pinnedActions.includes('snapshots') && (
-									<IconButton
-										name="clock"
-										onPress={() => setShowSnapshots(true)}
-										onLongPress={() => Alert.alert('Open snapshots')}
-										accessibilityLabel="Open snapshots"
-									/>
-								)}
-							</ScrollView>
 						</>
 					)}
 				</View>
@@ -149,10 +86,6 @@ export const ChoptimaScreen: React.FC = memo(() => {
 					{activeTab === 'diagrams' && <DiagramsPlaceholder />}
 				</View>
 			</View>
-			<SnapshotExplorer
-				visible={showSnapshots}
-				onClose={() => setShowSnapshots(false)}
-			/>
 			{/* ActionsMenu anchor is rendered in the controls row above */}
 		</>
 	)

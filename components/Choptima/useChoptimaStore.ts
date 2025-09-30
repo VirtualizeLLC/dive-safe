@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { useShallow } from 'zustand/react/shallow'
 import { ChecklistStorage } from '@/app/storage/ChecklistStorage'
 
 type ChecklistItemState = {
@@ -126,16 +127,25 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 		} else {
 			set({ items: {} })
 		}
+
+		// when namespace changes, ensure pinned actions for that namespace are loaded
+		try {
+			const loader = get().loadPinnedActions
+			if (typeof loader === 'function') {
+				loader()
+			}
+		} catch (e) {
+			// ignore
+		}
 	},
 
 	// pinned actions persistence
 	setPinnedActions: (ids) => {
 		set({ pinnedActions: ids })
 		try {
-			ChecklistStorage.set(
-				pinnedStorageKey(get().namespace),
-				JSON.stringify(ids),
-			)
+			const key = pinnedStorageKey(get().namespace)
+			const raw = JSON.stringify(ids)
+			ChecklistStorage.set(key, raw)
 		} catch (e) {
 			console.warn('useChoptimaStore: failed to persist pinned actions', e)
 		}
@@ -147,12 +157,11 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 			const next = prev.includes(actionId)
 				? prev.filter((p) => p !== actionId)
 				: [...prev, actionId]
-			// persist
+			// persist with logging
 			try {
-				ChecklistStorage.set(
-					pinnedStorageKey(state.namespace),
-					JSON.stringify(next),
-				)
+				const key = pinnedStorageKey(state.namespace)
+				const raw = JSON.stringify(next)
+				ChecklistStorage.set(key, raw)
 			} catch (e) {
 				console.warn(
 					'useChoptimaStore: failed to persist toggled pinned action',
@@ -165,7 +174,8 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 
 	loadPinnedActions: () => {
 		try {
-			const raw = ChecklistStorage.getString(pinnedStorageKey(get().namespace))
+			const key = pinnedStorageKey(get().namespace)
+			const raw = ChecklistStorage.getString(key)
 			if (raw) {
 				const parsed = JSON.parse(raw)
 				if (Array.isArray(parsed)) {
@@ -299,4 +309,5 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 	},
 }))
 
+// todo migrate to named export
 export default useChoptimaStore
