@@ -126,7 +126,6 @@ const SnapshotExplorer: React.FC<{ visible: boolean; onClose: () => void }> = ({
 		if (!newName) return
 		const newKey = `${SNAPSHOT_PREFIX}${newName.replace(/\s+/g, '_')}`
 		// avoid clobber
-		// @ts-expect-error
 		const exists = ChecklistStorage.getString(newKey)
 		if (exists) {
 			Alert.alert('Rename failed', 'A snapshot with that name already exists.')

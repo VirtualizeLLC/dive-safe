@@ -165,11 +165,15 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 	},
 
 	saveSnapshot: (name) => {
-		const snapshotName =
-			name || `${STORAGE_PREFIX}:snapshot:${new Date().toISOString()}`
+		// Always write snapshots under the canonical prefix so explorers and lists can find them.
 		try {
+			const timestamp = new Date().toISOString()
+			const safeName = name
+				? String(name).trim().replace(/\s+/g, '_')
+				: timestamp
+			const snapshotKey = `${STORAGE_PREFIX}:snapshot:${safeName}`
 			const data = JSON.stringify(get().items)
-			ChecklistStorage.set(snapshotName, data)
+			ChecklistStorage.set(snapshotKey, data)
 		} catch (e) {
 			console.warn('useChoptimaStore: failed to save snapshot', e)
 		}
