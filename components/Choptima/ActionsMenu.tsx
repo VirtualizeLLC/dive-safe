@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import type { GestureResponderEvent } from 'react-native'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Menu } from 'react-native-paper'
+import { IconSymbol } from '@/components/ui/icon-symbol'
 
 type Props = {
 	checklistMode: boolean
@@ -24,11 +26,6 @@ const ActionsMenu: React.FC<Props> = ({
 	onTogglePin,
 }) => {
 	const [visible, setVisible] = useState(false)
-	useEffect(() => {
-		return () => {
-			// no timers to clean up anymore
-		}
-	}, [])
 
 	return (
 		<Menu
@@ -37,14 +34,14 @@ const ActionsMenu: React.FC<Props> = ({
 			anchor={
 				<TouchableOpacity
 					style={styles.actionsBtn}
-					onPress={() => setVisible(true)}
+					onPressIn={() => setVisible(true)}
+					accessibilityLabel="Open actions"
 				>
 					<Text style={styles.actionsBtnText}>Actions ▾</Text>
 				</TouchableOpacity>
 			}
 		>
 			<View style={styles.menuContent}>
-				{/* Turn checklist ON/OFF */}
 				<View style={styles.itemRow}>
 					<TouchableOpacity
 						style={styles.itemAction}
@@ -59,15 +56,22 @@ const ActionsMenu: React.FC<Props> = ({
 					</TouchableOpacity>
 					<TouchableOpacity
 						style={styles.pin}
-						onPress={() => onTogglePin?.('toggle_checklist')}
+						onPress={(e: GestureResponderEvent) => {
+							e.stopPropagation()
+							onTogglePin?.('toggle_checklist')
+						}}
+						accessibilityLabel="Pin toggle checklist"
 					>
-						<Text style={styles.pinText}>
-							{pinnedActions?.includes('toggle_checklist') ? '📌' : '📍'}
-						</Text>
+						<IconSymbol
+							name={'pin'}
+							size={18}
+							color={
+								pinnedActions?.includes('toggle_checklist') ? '#ff9800' : '#888'
+							}
+						/>
 					</TouchableOpacity>
 				</View>
 
-				{/* Expand/Collapse all */}
 				<View style={styles.itemRow}>
 					<TouchableOpacity
 						style={styles.itemAction}
@@ -82,15 +86,22 @@ const ActionsMenu: React.FC<Props> = ({
 					</TouchableOpacity>
 					<TouchableOpacity
 						style={styles.pin}
-						onPress={() => onTogglePin?.('toggle_expand')}
+						onPress={(e: GestureResponderEvent) => {
+							e.stopPropagation()
+							onTogglePin?.('toggle_expand')
+						}}
+						accessibilityLabel="Pin expand all"
 					>
-						<Text style={styles.pinText}>
-							{pinnedActions?.includes('toggle_expand') ? '📌' : '📍'}
-						</Text>
+						<IconSymbol
+							name={'pin'}
+							size={18}
+							color={
+								pinnedActions?.includes('toggle_expand') ? '#ff9800' : '#888'
+							}
+						/>
 					</TouchableOpacity>
 				</View>
 
-				{/* Save snapshot */}
 				<View style={styles.itemRow}>
 					<TouchableOpacity
 						style={styles.itemAction}
@@ -103,15 +114,20 @@ const ActionsMenu: React.FC<Props> = ({
 					</TouchableOpacity>
 					<TouchableOpacity
 						style={styles.pin}
-						onPress={() => onTogglePin?.('save')}
+						onPress={(e: GestureResponderEvent) => {
+							e.stopPropagation()
+							onTogglePin?.('save')
+						}}
+						accessibilityLabel="Pin save"
 					>
-						<Text style={styles.pinText}>
-							{pinnedActions?.includes('save') ? '📌' : '📍'}
-						</Text>
+						<IconSymbol
+							name={'pin'}
+							size={18}
+							color={pinnedActions?.includes('save') ? '#ff9800' : '#888'}
+						/>
 					</TouchableOpacity>
 				</View>
 
-				{/* Browse snapshots */}
 				<View style={styles.itemRow}>
 					<TouchableOpacity
 						style={styles.itemAction}
@@ -124,11 +140,17 @@ const ActionsMenu: React.FC<Props> = ({
 					</TouchableOpacity>
 					<TouchableOpacity
 						style={styles.pin}
-						onPress={() => onTogglePin?.('snapshots')}
+						onPress={(e: GestureResponderEvent) => {
+							e.stopPropagation()
+							onTogglePin?.('snapshots')
+						}}
+						accessibilityLabel="Pin snapshots"
 					>
-						<Text style={styles.pinText}>
-							{pinnedActions?.includes('snapshots') ? '📌' : '📍'}
-						</Text>
+						<IconSymbol
+							name={'pin'}
+							size={18}
+							color={pinnedActions?.includes('snapshots') ? '#ff9800' : '#888'}
+						/>
 					</TouchableOpacity>
 				</View>
 			</View>
@@ -138,13 +160,14 @@ const ActionsMenu: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
 	menuContent: { width: 260 },
-	item: {
+	itemRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
 		paddingVertical: 10,
 		paddingHorizontal: 8,
 		borderBottomWidth: 1,
 		borderBottomColor: '#f2f2f2',
 	},
-	itemRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 8, borderBottomWidth: 1, borderBottomColor: '#f2f2f2' },
 	itemAction: { flex: 1 },
 	itemText: { fontSize: 15, color: '#222' },
 	actionsBtn: {

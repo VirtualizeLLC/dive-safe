@@ -1,6 +1,9 @@
-// Fallback for using MaterialIcons on Android and web.
+// Use Expo's icon package so font assets and resolution are handled by Expo.
+// This avoids manual linking and resolution issues that can occur when
+// importing vector icons directly from react-native-vector-icons in an
+// Expo-managed project.
 
-import MaterialIcons from '@expo/vector-icons/MaterialIcons'
+import { MaterialIcons } from '@expo/vector-icons'
 import type { SymbolViewProps, SymbolWeight } from 'expo-symbols'
 import type { ComponentProps } from 'react'
 import type { OpaqueColorValue, StyleProp, TextStyle } from 'react-native'
@@ -26,6 +29,8 @@ const MAPPING = {
 	'chevron.down': 'expand-more',
 	'square.and.arrow.down': 'save',
 	clock: 'history',
+	// pin/bookmark
+	pin: 'push-pin',
 } as IconMapping
 
 /**

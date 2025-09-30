@@ -159,13 +159,13 @@ export const ChoptimaStep: React.FC<Props> = ({
 
 	const requiredInputIds = useMemo(() => {
 		const ids: string[] = []
-		substeps.forEach((ss) => {
-			ss.inputs?.forEach((inp) => ids.push(inp.id))
-		})
+		for (const ss of substeps) {
+			if (ss.inputs) for (const inp of ss.inputs) ids.push(inp.id)
+		}
 		return ids
 	}, [substeps])
 
-	const validator = () => {
+	const validator = React.useCallback(() => {
 		if (requiredInputIds.length === 0) return null
 		const missing = requiredInputIds.filter((id) => {
 			const v = values?.[id]
@@ -173,12 +173,12 @@ export const ChoptimaStep: React.FC<Props> = ({
 		})
 		if (missing.length > 0) return 'Please enter required data'
 		return null
-	}
+	}, [requiredInputIds, values])
 
 	useEffect(() => {
 		if (!hasValidationError) return
 		if (validator() === null) setHasValidationError(false)
-	}, [values, hasValidationError, validator])
+	}, [hasValidationError, validator])
 
 	return (
 		<View>

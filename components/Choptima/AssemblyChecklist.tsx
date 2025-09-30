@@ -35,13 +35,9 @@ export const AssemblyChecklist: React.FC = () => {
 							isChecked={items[step.id]?.checked || false}
 							validator={() => {
 								// runtime-only validation for required child inputs
-								// @ts-expect-error - dynamic shape from sampleSteps
 								if (!step.children) return null
-								// @ts-expect-error
 								for (const ss of step.children) {
-									// @ts-expect-error
 									if (!ss.inputs) continue
-									// @ts-expect-error
 									for (const inp of ss.inputs) {
 										const val = items[step.id]?.values?.[inp.id]
 										if (!val || String(val).trim() === '')
@@ -96,13 +92,9 @@ export const AssemblyChecklistControlled: React.FC<AssemblyChecklistProps> = ({
 							isChecked={items[step.id]?.checked || false}
 							validator={() => {
 								// runtime-only validation using children inputs
-								// @ts-expect-error
 								if (!step.children) return null
-								// @ts-expect-error
 								for (const ss of step.children) {
-									// @ts-expect-error
 									if (!ss.inputs) continue
-									// @ts-expect-error
 									for (const inp of ss.inputs) {
 										const val = items[step.id]?.values?.[inp.id]
 										if (!val || String(val).trim() === '')
