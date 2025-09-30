@@ -28,6 +28,9 @@ type ChoptimaState = {
 	setPinnedActions: (ids: string[]) => void
 	togglePinnedAction: (actionId: string) => void
 	loadPinnedActions: () => void
+	// currently loaded snapshot name (safe name used in storage)
+	loadedSnapshotName?: string
+	setLoadedSnapshotName: (name?: string) => void
 }
 
 const STORAGE_PREFIX = 'checklist'
@@ -97,6 +100,7 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 	items: {},
 	namespace: undefined,
 	pinnedActions: [],
+	loadedSnapshotName: undefined,
 
 	setNamespace: (ns) => {
 		set({ namespace: ns })
@@ -173,6 +177,10 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 		}
 	},
 
+	setLoadedSnapshotName: (name) => {
+		set({ loadedSnapshotName: name })
+	},
+
 	loadNamespace: (ns) => {
 		// alias for setNamespace
 		get().setNamespace(ns)
@@ -239,6 +247,8 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 			const snapshotKey = `${STORAGE_PREFIX}:snapshot:${safeName}`
 			const data = JSON.stringify(get().items)
 			ChecklistStorage.set(snapshotKey, data)
+			// record the loaded snapshot name when saving
+			set({ loadedSnapshotName: safeName })
 		} catch (e) {
 			console.warn('useChoptimaStore: failed to save snapshot', e)
 		}
@@ -273,6 +283,16 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 			if (!raw) return
 			const parsed = JSON.parse(raw)
 			set({ items: parsed })
+			// try to extract a human key portion from the storage key
+			try {
+				const marker = `${STORAGE_PREFIX}:snapshot:`
+				if (key?.startsWith(marker)) {
+					const name = key.slice(marker.length)
+					set({ loadedSnapshotName: name })
+				}
+			} catch (_e) {
+				// ignore
+			}
 		} catch (e) {
 			console.warn('useChoptimaStore: failed to load snapshot', key, e)
 		}

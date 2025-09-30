@@ -1,7 +1,7 @@
 import { memo, useRef, useState } from 'react'
 import type { GestureResponderEvent } from 'react-native'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { Menu } from 'react-native-paper'
+import { Icon, IconButton, Menu } from 'react-native-paper'
 import { IconSymbol } from '@/components/ui/icon-symbol'
 
 type Props = {
@@ -13,6 +13,18 @@ type Props = {
 	onOpenSnapshots: () => void
 	pinnedActions?: string[]
 	onTogglePin?: (actionId: string) => void
+}
+
+{
+	/* <TouchableOpacity
+					onPress={() => {
+						setVisible(true)
+					}}
+					accessibilityLabel="Open actions"
+					style={[styles.actionsBtn, { flexDirection: 'row' }]}
+				>
+					<Text style={styles.actionsBtnText}>Actions ▾</Text>
+				</TouchableOpacity> */
 }
 
 const ActionsMenu: React.FC<Props> = memo(
@@ -29,16 +41,21 @@ const ActionsMenu: React.FC<Props> = memo(
 		const [visible, setVisible] = useState(false)
 
 		return (
-			<View style={{ position: 'relative' }}>
-				<TouchableOpacity
-					style={styles.actionsBtn}
+			<View
+				style={{
+					position: 'relative',
+					flexDirection: 'row',
+					alignItems: 'center',
+				}}
+			>
+				<IconButton
 					onPress={() => {
 						setVisible(true)
 					}}
-					accessibilityLabel="Open actions"
-				>
-					<Text style={styles.actionsBtnText}>Actions ▾</Text>
-				</TouchableOpacity>
+					icon={'dots-vertical'}
+					size={24}
+					style={[styles.actionsBtn, { flexDirection: 'row' }]}
+				/>
 				<View style={{ position: 'absolute', top: 32, left: 0, zIndex: 1000 }}>
 					{visible && (
 						<Menu
