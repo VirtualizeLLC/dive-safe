@@ -1,5 +1,5 @@
 import type React from 'react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import {
 	Alert,
 	Pressable,
@@ -23,7 +23,7 @@ import DiagramsPlaceholder from './DiagramsPlaceholder'
 import TabButton from './TabButton'
 import useChoptimaStore from './useChoptimaStore'
 
-export const ChoptimaScreen: React.FC = () => {
+export const ChoptimaScreen: React.FC = memo(() => {
 	const [activeTab, setActiveTab] = useState<
 		'assembly' | 'disassembly' | 'diagrams'
 	>('assembly')
@@ -156,7 +156,9 @@ export const ChoptimaScreen: React.FC = () => {
 			{/* ActionsMenu anchor is rendered in the controls row above */}
 		</>
 	)
-}
+})
+
+ChoptimaScreen.displayName = 'ChoptimaScreen'
 
 const styles = StyleSheet.create({
 	container: { flex: 1 },

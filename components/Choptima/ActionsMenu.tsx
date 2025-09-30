@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { memo, useRef, useState } from 'react'
 import type { GestureResponderEvent } from 'react-native'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Menu } from 'react-native-paper'
@@ -15,148 +15,176 @@ type Props = {
 	onTogglePin?: (actionId: string) => void
 }
 
-const ActionsMenu: React.FC<Props> = ({
-	checklistMode,
-	onToggleChecklist,
-	expandAll,
-	onToggleExpandAll,
-	onSave,
-	onOpenSnapshots,
-	pinnedActions,
-	onTogglePin,
-}) => {
-	const [visible, setVisible] = useState(false)
+const ActionsMenu: React.FC<Props> = memo(
+	({
+		checklistMode,
+		onToggleChecklist,
+		expandAll,
+		onToggleExpandAll,
+		onSave,
+		onOpenSnapshots,
+		pinnedActions,
+		onTogglePin,
+	}) => {
+		const [visible, setVisible] = useState(false)
 
-	return (
-		<Menu
-			visible={visible}
-			onDismiss={() => setVisible(false)}
-			anchor={
+		return (
+			<View style={{ position: 'relative' }}>
 				<TouchableOpacity
 					style={styles.actionsBtn}
-					onPressIn={() => setVisible(true)}
+					onPress={() => {
+						setVisible(true)
+					}}
 					accessibilityLabel="Open actions"
 				>
 					<Text style={styles.actionsBtnText}>Actions ▾</Text>
 				</TouchableOpacity>
-			}
-		>
-			<View style={styles.menuContent}>
-				<View style={styles.itemRow}>
-					<TouchableOpacity
-						style={styles.itemAction}
-						onPress={() => {
-							onToggleChecklist()
-							setVisible(false)
-						}}
-					>
-						<Text style={styles.itemText}>
-							{checklistMode ? 'Turn checklist OFF' : 'Turn checklist ON'}
-						</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={styles.pin}
-						onPress={(e: GestureResponderEvent) => {
-							e.stopPropagation()
-							onTogglePin?.('toggle_checklist')
-						}}
-						accessibilityLabel="Pin toggle checklist"
-					>
-						<IconSymbol
-							name={'pin'}
-							size={18}
-							color={
-								pinnedActions?.includes('toggle_checklist') ? '#ff9800' : '#888'
+				<View style={{ position: 'absolute', top: 32, left: 0, zIndex: 1000 }}>
+					{visible && (
+						<Menu
+							visible={visible}
+							onDismiss={() => {
+								setVisible(false)
+							}}
+							mode="elevated"
+							anchor={
+								<View style={[styles.actionsBtn, { height: 0, width: 0 }]} />
 							}
-						/>
-					</TouchableOpacity>
-				</View>
+						>
+							<View style={styles.menuContent}>
+								<View style={styles.itemRow}>
+									<TouchableOpacity
+										style={styles.itemAction}
+										onPress={() => {
+											onToggleChecklist()
+											setVisible(false)
+										}}
+									>
+										<Text style={styles.itemText}>
+											{checklistMode
+												? 'Turn checklist OFF'
+												: 'Turn checklist ON'}
+										</Text>
+									</TouchableOpacity>
+									<TouchableOpacity
+										style={styles.pin}
+										onPress={(e: GestureResponderEvent) => {
+											e.stopPropagation()
+											onTogglePin?.('toggle_checklist')
+										}}
+										accessibilityLabel="Pin toggle checklist"
+									>
+										<IconSymbol
+											name={'pin'}
+											size={18}
+											color={
+												pinnedActions?.includes('toggle_checklist')
+													? '#ff9800'
+													: '#888'
+											}
+										/>
+									</TouchableOpacity>
+								</View>
 
-				<View style={styles.itemRow}>
-					<TouchableOpacity
-						style={styles.itemAction}
-						onPress={() => {
-							onToggleExpandAll()
-							setVisible(false)
-						}}
-					>
-						<Text style={styles.itemText}>
-							{expandAll ? 'Collapse all' : 'Expand all'}
-						</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={styles.pin}
-						onPress={(e: GestureResponderEvent) => {
-							e.stopPropagation()
-							onTogglePin?.('toggle_expand')
-						}}
-						accessibilityLabel="Pin expand all"
-					>
-						<IconSymbol
-							name={'pin'}
-							size={18}
-							color={
-								pinnedActions?.includes('toggle_expand') ? '#ff9800' : '#888'
-							}
-						/>
-					</TouchableOpacity>
-				</View>
+								<View style={styles.itemRow}>
+									<TouchableOpacity
+										style={styles.itemAction}
+										onPress={() => {
+											onToggleExpandAll()
+											setVisible(false)
+										}}
+									>
+										<Text style={styles.itemText}>
+											{expandAll ? 'Collapse all' : 'Expand all'}
+										</Text>
+									</TouchableOpacity>
+									<TouchableOpacity
+										style={styles.pin}
+										onPress={(e: GestureResponderEvent) => {
+											e.stopPropagation()
+											onTogglePin?.('toggle_expand')
+										}}
+										accessibilityLabel="Pin expand all"
+									>
+										<IconSymbol
+											name={'pin'}
+											size={18}
+											color={
+												pinnedActions?.includes('toggle_expand')
+													? '#ff9800'
+													: '#888'
+											}
+										/>
+									</TouchableOpacity>
+								</View>
 
-				<View style={styles.itemRow}>
-					<TouchableOpacity
-						style={styles.itemAction}
-						onPress={() => {
-							onSave()
-							setVisible(false)
-						}}
-					>
-						<Text style={styles.itemText}>Save snapshot</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={styles.pin}
-						onPress={(e: GestureResponderEvent) => {
-							e.stopPropagation()
-							onTogglePin?.('save')
-						}}
-						accessibilityLabel="Pin save"
-					>
-						<IconSymbol
-							name={'pin'}
-							size={18}
-							color={pinnedActions?.includes('save') ? '#ff9800' : '#888'}
-						/>
-					</TouchableOpacity>
-				</View>
+								<View style={styles.itemRow}>
+									<TouchableOpacity
+										style={styles.itemAction}
+										onPress={() => {
+											onSave()
+											setVisible(false)
+										}}
+									>
+										<Text style={styles.itemText}>Save snapshot</Text>
+									</TouchableOpacity>
+									<TouchableOpacity
+										style={styles.pin}
+										onPress={(e: GestureResponderEvent) => {
+											e.stopPropagation()
+											onTogglePin?.('save')
+										}}
+										accessibilityLabel="Pin save"
+									>
+										<IconSymbol
+											name={'pin'}
+											size={18}
+											color={
+												pinnedActions?.includes('save') ? '#ff9800' : '#888'
+											}
+										/>
+									</TouchableOpacity>
+								</View>
 
-				<View style={styles.itemRow}>
-					<TouchableOpacity
-						style={styles.itemAction}
-						onPress={() => {
-							onOpenSnapshots()
-							setVisible(false)
-						}}
-					>
-						<Text style={styles.itemText}>Browse snapshots</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={styles.pin}
-						onPress={(e: GestureResponderEvent) => {
-							e.stopPropagation()
-							onTogglePin?.('snapshots')
-						}}
-						accessibilityLabel="Pin snapshots"
-					>
-						<IconSymbol
-							name={'pin'}
-							size={18}
-							color={pinnedActions?.includes('snapshots') ? '#ff9800' : '#888'}
-						/>
-					</TouchableOpacity>
+								<View style={styles.itemRow}>
+									<TouchableOpacity
+										style={styles.itemAction}
+										onPress={() => {
+											onOpenSnapshots()
+											setVisible(false)
+										}}
+									>
+										<Text style={styles.itemText}>Browse snapshots</Text>
+									</TouchableOpacity>
+									<TouchableOpacity
+										style={styles.pin}
+										onPress={(e: GestureResponderEvent) => {
+											e.stopPropagation()
+											onTogglePin?.('snapshots')
+										}}
+										accessibilityLabel="Pin snapshots"
+									>
+										<IconSymbol
+											name={'pin'}
+											size={18}
+											color={
+												pinnedActions?.includes('snapshots')
+													? '#ff9800'
+													: '#888'
+											}
+										/>
+									</TouchableOpacity>
+								</View>
+							</View>
+						</Menu>
+					)}
 				</View>
 			</View>
-		</Menu>
-	)
-}
+		)
+	},
+)
+
+ActionsMenu.displayName = 'ActionsMenu'
 
 const styles = StyleSheet.create({
 	menuContent: { width: 260 },

@@ -1,5 +1,6 @@
-import { type FC, useEffect, useState } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { type FC, useEffect, useRef, useState } from 'react'
+import { StyleSheet, Text, View } from 'react-native'
+import { Checkbox as PaperCheckbox } from 'react-native-paper'
 
 type Props = {
 	isChecked: boolean
@@ -15,8 +16,19 @@ const CheckboxInternalState: FC<Props> = ({
 }) => {
 	const [checked, setChecked] = useState(isChecked)
 	const [error, setError] = useState<string | null>(null)
+	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
 	useEffect(() => setChecked(isChecked), [isChecked])
+
+	useEffect(
+		() => () => {
+			if (timerRef.current) {
+				clearTimeout(timerRef.current)
+				timerRef.current = null
+			}
+		},
+		[],
+	)
 
 	const handlePress = () => {
 		// If checking, run validator
@@ -25,7 +37,11 @@ const CheckboxInternalState: FC<Props> = ({
 			if (err) {
 				setError(err)
 				// briefly show error
-				setTimeout(() => setError(null), 2500)
+				if (timerRef.current) clearTimeout(timerRef.current)
+				timerRef.current = setTimeout(() => {
+					setError(null)
+					timerRef.current = null
+				}, 2500)
 				return
 			}
 		}
@@ -38,13 +54,12 @@ const CheckboxInternalState: FC<Props> = ({
 
 	return (
 		<View style={{ alignItems: 'center' }}>
-			<TouchableOpacity
+			<PaperCheckbox
+				status={checked ? 'checked' : 'unchecked'}
 				onPress={handlePress}
-				style={[styles.checkbox, checked && styles.checkboxChecked]}
-				activeOpacity={0.7}
-			>
-				{checked && <Text style={styles.checkboxMark}>✓</Text>}
-			</TouchableOpacity>
+				accessibilityLabel="Checklist step checkbox"
+				color="#0a84ff"
+			/>
 			{error ? <Text style={styles.error}>{error}</Text> : null}
 		</View>
 	)
