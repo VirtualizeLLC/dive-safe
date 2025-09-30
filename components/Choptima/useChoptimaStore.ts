@@ -4,6 +4,8 @@ import { ChecklistStorage } from '@/app/storage/ChecklistStorage'
 type ChecklistItemState = {
 	checked: boolean
 	notes?: string
+	// arbitrary named values for inputs/subtasks
+	values?: Record<string, string>
 }
 
 type ChoptimaState = {
@@ -14,12 +16,18 @@ type ChoptimaState = {
 	setNamespace: (ns?: string) => void
 	loadNamespace: (ns?: string) => void
 	setItem: (id: string, patch: Partial<ChecklistItemState>) => void
+	setField: (id: string, fieldId: string, value: string) => void
 	removeItem: (id: string) => void
 	clear: () => void
 	saveSnapshot: (name?: string) => void
 	listNamespaces: () => string[]
 	listSnapshots: () => string[]
 	loadSnapshot: (key: string) => void
+	// pinned UI actions persisted to MMKV
+	pinnedActions: string[]
+	setPinnedActions: (ids: string[]) => void
+	togglePinnedAction: (actionId: string) => void
+	loadPinnedActions: () => void
 }
 
 const STORAGE_PREFIX = 'checklist'
@@ -32,18 +40,6 @@ function storageKeyFor(ns?: string) {
 const PERSIST_DEBOUNCE_MS = 1000
 const pendingTimers: Record<string, number> = {}
 const pendingPayloads: Record<string, string> = {}
-
-function persistNow(
-	ns: string | undefined,
-	payload: Record<string, ChecklistItemState>,
-) {
-	const key = storageKeyFor(ns)
-	try {
-		ChecklistStorage.set(key, JSON.stringify(payload))
-	} catch (e) {
-		console.warn('useChoptimaStore: failed to persist to storage', key, e)
-	}
-}
 
 function schedulePersist(
 	ns: string | undefined,
@@ -91,9 +87,16 @@ function listAllKeys(): string[] {
 	}
 }
 
+function pinnedStorageKey(ns?: string) {
+	return ns
+		? `${STORAGE_PREFIX}:pinned:${ns}`
+		: `${STORAGE_PREFIX}:pinned:default`
+}
+
 export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 	items: {},
 	namespace: undefined,
+	pinnedActions: [],
 
 	setNamespace: (ns) => {
 		set({ namespace: ns })
@@ -121,6 +124,55 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 		}
 	},
 
+	// pinned actions persistence
+	setPinnedActions: (ids) => {
+		set({ pinnedActions: ids })
+		try {
+			ChecklistStorage.set(
+				pinnedStorageKey(get().namespace),
+				JSON.stringify(ids),
+			)
+		} catch (e) {
+			console.warn('useChoptimaStore: failed to persist pinned actions', e)
+		}
+	},
+
+	togglePinnedAction: (actionId) => {
+		set((state) => {
+			const prev = state.pinnedActions || []
+			const next = prev.includes(actionId)
+				? prev.filter((p) => p !== actionId)
+				: [...prev, actionId]
+			// persist
+			try {
+				ChecklistStorage.set(
+					pinnedStorageKey(state.namespace),
+					JSON.stringify(next),
+				)
+			} catch (e) {
+				console.warn(
+					'useChoptimaStore: failed to persist toggled pinned action',
+					e,
+				)
+			}
+			return { pinnedActions: next }
+		})
+	},
+
+	loadPinnedActions: () => {
+		try {
+			const raw = ChecklistStorage.getString(pinnedStorageKey(get().namespace))
+			if (raw) {
+				const parsed = JSON.parse(raw)
+				if (Array.isArray(parsed)) {
+					set({ pinnedActions: parsed })
+				}
+			}
+		} catch (e) {
+			console.warn('useChoptimaStore: failed to load pinned actions', e)
+		}
+	},
+
 	loadNamespace: (ns) => {
 		// alias for setNamespace
 		get().setNamespace(ns)
@@ -132,6 +184,19 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 				...state.items,
 				[id]: { ...(state.items[id] || { checked: false }), ...patch },
 			}
+			schedulePersist(state.namespace, next)
+			return { items: next }
+		})
+	},
+
+	setField: (id, fieldId, value) => {
+		set((state) => {
+			const current = state.items[id] || { checked: false, values: {} }
+			const nextItem = {
+				...current,
+				values: { ...(current.values || {}), [fieldId]: value },
+			}
+			const next = { ...state.items, [id]: nextItem }
 			schedulePersist(state.namespace, next)
 			return { items: next }
 		})

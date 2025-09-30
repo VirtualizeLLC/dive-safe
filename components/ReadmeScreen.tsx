@@ -7,14 +7,14 @@ import Markdown from 'react-native-markdown-display'
 import readme from './readme-content'
 
 export default function ReadmeScreen() {
-  return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Markdown>{readme as unknown as string}</Markdown>
-    </ScrollView>
-  )
+	return (
+		<ScrollView style={styles.container} contentContainerStyle={styles.content}>
+			<Markdown>{readme as unknown as string}</Markdown>
+		</ScrollView>
+	)
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  content: { padding: 16 },
+	container: { flex: 1, backgroundColor: '#fff' },
+	content: { padding: 16 },
 })

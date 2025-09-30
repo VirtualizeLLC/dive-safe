@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import FullAppEntry from './full-app-entry'
-import withHocs from './hocs'
+import { withHocs } from './hocs/withHocs'
 import { withRootProviders } from './hocs/withRootProviders'
 import StorybookEntry from './storybook-entry'
 

@@ -9,13 +9,16 @@ import {
 } from 'react-native'
 import ChoptimaStep from './ChoptimaStep'
 
-type AssemblyStep = {
+export type AssemblyStep = {
 	id: string
 	step?: string
 	title: string
 	content?: string
 	images?: string[]
+	// nested steps
 	children?: AssemblyStep[]
+	// optional input definitions for this step (used for validation/subtasks)
+	inputs?: { id: string; label: string; placeholder?: string }[]
 }
 
 export const sampleSteps: AssemblyStep[] = [
@@ -113,6 +116,18 @@ export const sampleSteps: AssemblyStep[] = [
 		title: 'Record O2 sensor readings',
 		content:
 			'With scrubber filled and flushed with O2, check and record O2 sensor mV readings and verify they are within expected ranges.',
+		// require three sensor readings: mv1, mv2, mv3
+		children: [
+			{
+				id: '4d-sensors',
+				title: 'O2 sensor mV readings',
+				inputs: [
+					{ id: 'mv1', label: 'Sensor 1 (mV)', placeholder: 'e.g. 400' },
+					{ id: 'mv2', label: 'Sensor 2 (mV)', placeholder: 'e.g. 410' },
+					{ id: 'mv3', label: 'Sensor 3 (mV)', placeholder: 'e.g. 395' },
+				],
+			},
+		],
 	},
 	{
 		id: '5',
@@ -167,6 +182,24 @@ export const sampleSteps: AssemblyStep[] = [
 		step: '6',
 		title: 'Oxygen Cylinder & Regulator',
 		content: '## Oxygen & regulator\n\nInstall oxygen supply and regulator.',
+		children: [
+			{
+				id: '6d-batteries',
+				title: 'Battery voltages',
+				inputs: [
+					{
+						id: 'bat1',
+						label: 'DiveCan battery 1 (V)',
+						placeholder: 'e.g. 13.2',
+					},
+					{
+						id: 'bat2',
+						label: 'DiveCan battery 2 (V)',
+						placeholder: 'e.g. 13.1',
+					},
+				],
+			},
+		],
 	},
 	{
 		id: '6a',

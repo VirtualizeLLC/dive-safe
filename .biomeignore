@@ -1,0 +1,15 @@
+node_modules/
+android/
+ios/
+build/
+**/build/
+**/.cxx/
+**/android/**
+**/ios/**
+*.log
+*.keystore
+/.expo/
+.expo/
+dist/
+coverage/
+**/generated/

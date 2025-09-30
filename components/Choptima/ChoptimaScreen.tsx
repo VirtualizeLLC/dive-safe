@@ -1,6 +1,7 @@
 import type React from 'react'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
+	Alert,
 	Pressable,
 	ScrollView,
 	StyleSheet,
@@ -10,6 +11,7 @@ import {
 } from 'react-native'
 import { ChecklistStorage } from '@/app/storage/ChecklistStorage'
 import SnapshotExplorer from '@/components/Snapshots/SnapshotExplorer'
+import { IconButton } from '@/components/ui/IconButton'
 import ActionsMenu from './ActionsMenu'
 import AssemblyChecklist, {
 	AssemblyChecklistControlled,
@@ -28,7 +30,15 @@ export const ChoptimaScreen: React.FC = () => {
 	const [checklistMode, setChecklistMode] = useState(false)
 	const [expandAll, setExpandAll] = useState(false)
 	const [showSnapshots, setShowSnapshots] = useState(false)
-	const [showActions, setShowActions] = useState(false)
+	// pinned actions persisted in store
+	const pinnedActions = useChoptimaStore((s) => s.pinnedActions)
+	const togglePinnedAction = useChoptimaStore((s) => s.togglePinnedAction)
+	const loadPinnedActions = useChoptimaStore((s) => s.loadPinnedActions)
+
+	// initialize persisted pinned actions when this screen mounts
+	useEffect(() => {
+		loadPinnedActions()
+	}, [loadPinnedActions])
 	const saveSnapshot = useChoptimaStore((s) => s.saveSnapshot)
 
 	const handleSave = useCallback(() => {
@@ -62,12 +72,63 @@ export const ChoptimaScreen: React.FC = () => {
 				{/* Compact Actions button that opens the actions menu */}
 				<View style={styles.tabControlsRow}>
 					{activeTab === 'assembly' && (
-						<TouchableOpacity
-							style={styles.actionsBtn}
-							onPress={() => setShowActions(true)}
-						>
-							<Text style={styles.actionsBtnText}>Actions ▾</Text>
-						</TouchableOpacity>
+						<>
+							{/* Actions button on the far left (anchor provided by ActionsMenu) */}
+							<ActionsMenu
+								checklistMode={checklistMode}
+								onToggleChecklist={() => setChecklistMode((v) => !v)}
+								expandAll={expandAll}
+								onToggleExpandAll={() => setExpandAll((v) => !v)}
+								onSave={handleSave}
+								onOpenSnapshots={() => setShowSnapshots(true)}
+								pinnedActions={pinnedActions}
+								onTogglePin={(actionId: string) => togglePinnedAction(actionId)}
+							/>
+
+							{/* separator */}
+							<View style={styles.actionsSeparator} />
+
+							{/* horizontally scrollable pinned actions */}
+							<ScrollView
+								horizontal
+								showsHorizontalScrollIndicator={false}
+								contentContainerStyle={styles.pinnedRow}
+								style={styles.pinnedScroll}
+							>
+								{pinnedActions.includes('toggle_checklist') && (
+									<IconButton
+										name="checkmark.square.fill"
+										onPress={() => setChecklistMode((v) => !v)}
+										onLongPress={() => Alert.alert('Toggle checklist')}
+										accessibilityLabel="Toggle checklist"
+									/>
+								)}
+								{pinnedActions.includes('toggle_expand') && (
+									<IconButton
+										name="chevron.down"
+										onPress={() => setExpandAll((v) => !v)}
+										onLongPress={() => Alert.alert('Toggle expand/collapse')}
+										accessibilityLabel="Toggle expand/collapse"
+									/>
+								)}
+								{pinnedActions.includes('save') && (
+									<IconButton
+										name="square.and.arrow.down"
+										onPress={handleSave}
+										onLongPress={() => Alert.alert('Save snapshot')}
+										accessibilityLabel="Save snapshot"
+									/>
+								)}
+								{pinnedActions.includes('snapshots') && (
+									<IconButton
+										name="clock"
+										onPress={() => setShowSnapshots(true)}
+										onLongPress={() => Alert.alert('Open snapshots')}
+										accessibilityLabel="Open snapshots"
+									/>
+								)}
+							</ScrollView>
+						</>
 					)}
 				</View>
 
@@ -92,16 +153,7 @@ export const ChoptimaScreen: React.FC = () => {
 				visible={showSnapshots}
 				onClose={() => setShowSnapshots(false)}
 			/>
-			<ActionsMenu
-				visible={showActions}
-				onClose={() => setShowActions(false)}
-				checklistMode={checklistMode}
-				onToggleChecklist={() => setChecklistMode((v) => !v)}
-				expandAll={expandAll}
-				onToggleExpandAll={() => setExpandAll((v) => !v)}
-				onSave={handleSave}
-				onOpenSnapshots={() => setShowSnapshots(true)}
-			/>
+			{/* ActionsMenu anchor is rendered in the controls row above */}
 		</>
 	)
 }
@@ -192,6 +244,25 @@ const styles = StyleSheet.create({
 		backgroundColor: '#e6e6e6',
 	},
 	actionsBtnText: { color: '#333', fontWeight: '600' },
+	actionsSeparator: {
+		width: 1,
+		height: 36,
+		backgroundColor: '#e6e6e6',
+		marginHorizontal: 10,
+	},
+	pinnedRow: { alignItems: 'center' },
+	pinnedScroll: { flex: 1 },
+	iconQuick: {
+		width: 40,
+		height: 40,
+		borderRadius: 8,
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: '#fff',
+		marginRight: 8,
+		borderWidth: 1,
+		borderColor: '#eee',
+	},
 })
 
 export default ChoptimaScreen

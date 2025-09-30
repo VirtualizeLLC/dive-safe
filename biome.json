@@ -3,7 +3,7 @@
 	"vcs": {
 		"enabled": false,
 		"clientKind": "git",
-		"useIgnoreFile": false
+		"useIgnoreFile": true
 	},
 	"files": {
 		"ignoreUnknown": false
@@ -16,9 +16,9 @@
 		"enabled": true,
 		"rules": {
 			"recommended": true,
-				"correctness": {
-					"noUnusedImports": "off"
-				}
+			"correctness": {
+				"noUnusedImports": "off"
+			}
 		}
 	},
 	"javascript": {

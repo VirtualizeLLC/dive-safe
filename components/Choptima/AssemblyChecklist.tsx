@@ -1,13 +1,14 @@
 import type React from 'react'
 import { ScrollView, Text } from 'react-native'
 import CheckboxInternalState from './CheckboxInternalState'
-import { sampleSteps } from './ChoptimaAssembly'
+import { type AssemblyStep, sampleSteps } from './ChoptimaAssembly'
 import ChoptimaStep from './ChoptimaStep'
 import useChoptimaStore from './useChoptimaStore'
 
 export const AssemblyChecklist: React.FC = () => {
 	const items = useChoptimaStore((s) => s.items)
 	const setItem = useChoptimaStore((s) => s.setItem)
+	const setField = useChoptimaStore((s) => s.setField)
 
 	const handleToggle = (id: string, isChecked: boolean) => {
 		setItem(id, { checked: isChecked })
@@ -32,7 +33,27 @@ export const AssemblyChecklist: React.FC = () => {
 						<CheckboxInternalState
 							onPress={(isChecked: boolean) => handleToggle(step.id, isChecked)}
 							isChecked={items[step.id]?.checked || false}
+							validator={() => {
+								// runtime-only validation for required child inputs
+								// @ts-expect-error - dynamic shape from sampleSteps
+								if (!step.children) return null
+								// @ts-expect-error
+								for (const ss of step.children) {
+									// @ts-expect-error
+									if (!ss.inputs) continue
+									// @ts-expect-error
+									for (const inp of ss.inputs) {
+										const val = items[step.id]?.values?.[inp.id]
+										if (!val || String(val).trim() === '')
+											return `Please enter ${inp.label}`
+									}
+								}
+								return null
+							}}
 						/>
+					}
+					onInputChange={(inputId: string, value: string) =>
+						setField(step.id, inputId, value)
 					}
 				/>
 			))}
@@ -48,6 +69,7 @@ export const AssemblyChecklistControlled: React.FC<AssemblyChecklistProps> = ({
 }) => {
 	const items = useChoptimaStore((s) => s.items)
 	const setItem = useChoptimaStore((s) => s.setItem)
+	const setField = useChoptimaStore((s) => s.setField)
 
 	const handleToggle = (id: string, isChecked: boolean) => {
 		setItem(id, { checked: isChecked })
@@ -72,7 +94,27 @@ export const AssemblyChecklistControlled: React.FC<AssemblyChecklistProps> = ({
 						<CheckboxInternalState
 							onPress={(isChecked: boolean) => handleToggle(step.id, isChecked)}
 							isChecked={items[step.id]?.checked || false}
+							validator={() => {
+								// runtime-only validation using children inputs
+								// @ts-expect-error
+								if (!step.children) return null
+								// @ts-expect-error
+								for (const ss of step.children) {
+									// @ts-expect-error
+									if (!ss.inputs) continue
+									// @ts-expect-error
+									for (const inp of ss.inputs) {
+										const val = items[step.id]?.values?.[inp.id]
+										if (!val || String(val).trim() === '')
+											return `Please enter ${inp.label}`
+									}
+								}
+								return null
+							}}
 						/>
+					}
+					onInputChange={(inputId: string, value: string) =>
+						setField(step.id, inputId, value)
 					}
 					expanded={expandAll}
 					initiallyCollapsed={!expandAll}
