@@ -1,101 +1,32 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native';
-import ChoptimaAssembly, { sampleSteps } from './ChoptimaAssembly';
+import React, { useState, useCallback, useRef } from 'react';
+import { StyleSheet, Text, TouchableOpacity, Pressable, View, ScrollView } from 'react-native';
+import SnapshotExplorer from '@/components/Snapshots/SnapshotExplorer'
+import ChoptimaAssembly from './ChoptimaAssembly';
 import ChoptimaStep from './ChoptimaStep';
-
-
-const TabButton: React.FC<{ label: string; active: boolean; onPress: () => void }> = ({ label, active, onPress }) => (
-  <TouchableOpacity
-    onPress={onPress}
-    style={[styles.tab, active && styles.tabActive]}
-    activeOpacity={0.8}
-    accessibilityRole="button"
-  >
-    <Text style={[styles.tabText, active && styles.tabTextActive]}>{label}</Text>
-  </TouchableOpacity>
-);
-
-// Checklist mode for assembly steps (rendered inside Assembly view)
-const AssemblyChecklist: React.FC = () => {
-  const [checked, setChecked] = useState<{ [id: string]: boolean }>({});
-
-  const handleToggle = (id: string) => {
-    setChecked((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
-
-  return (
-    <ScrollView style={styles.checklistContainer} contentContainerStyle={styles.inner}>
-      <Text style={styles.header}>Choptima CCR Assembly Checklist</Text>
-      {sampleSteps.map((step) => (
-        <ChoptimaStep
-          key={step.id}
-          step={step.step}
-          title={step.title}
-          content={step.content}
-          images={step.images}
-          leftAccessory={(
-            <TouchableOpacity
-              onPress={() => handleToggle(step.id)}
-              style={[styles.checkbox, checked[step.id] && styles.checkboxChecked]}
-              activeOpacity={0.7}
-            >
-              {checked[step.id] && <Text style={styles.checkboxMark}>✓</Text>}
-            </TouchableOpacity>
-          )}
-        />
-      ))}
-    </ScrollView>
-  )
-}
-
-// Update AssemblyChecklist to accept expandAll prop so parent can control expansion
-interface AssemblyChecklistProps { expandAll?: boolean }
-const AssemblyChecklistControlled: React.FC<AssemblyChecklistProps> = ({ expandAll }) => {
-  const [checked, setChecked] = useState<{ [id: string]: boolean }>({});
-
-  const handleToggle = (id: string) => {
-    setChecked((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
-
-  return (
-    <ScrollView style={styles.checklistContainer} contentContainerStyle={styles.inner}>
-      <Text style={styles.header}>Choptima CCR Assembly Checklist</Text>
-      {sampleSteps.map((step) => (
-        <ChoptimaStep
-          key={step.id}
-          step={step.step}
-          title={step.title}
-          content={step.content}
-          images={step.images}
-          leftAccessory={(
-            <TouchableOpacity
-              onPress={() => handleToggle(step.id)}
-              style={[styles.checkbox, checked[step.id] && styles.checkboxChecked]}
-              activeOpacity={0.7}
-            >
-              {checked[step.id] && <Text style={styles.checkboxMark}>✓</Text>}
-            </TouchableOpacity>
-          )}
-          expanded={expandAll}
-          initiallyCollapsed={!expandAll}
-        />
-      ))}
-    </ScrollView>
-  )
-}
-
-const DiagramsPlaceholder: React.FC = () => (
-  <View style={styles.placeholder}>
-    <Text style={styles.placeholderText}>Diagrams and annotated images go here.</Text>
-  </View>
-)
+import { ChecklistStorage } from '@/app/storage/ChecklistStorage';
+import useChoptimaStore from './useChoptimaStore'
+import TabButton from './TabButton'
+import CheckboxInternalState from './CheckboxInternalState'
+import AssemblyChecklist, { AssemblyChecklistControlled } from './AssemblyChecklist'
+import DiagramsPlaceholder from './DiagramsPlaceholder'
 
 export const ChoptimaScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'assembly' | 'disassembly' | 'diagrams'>('assembly');
   const [checklistMode, setChecklistMode] = useState(false);
   const [expandAll, setExpandAll] = useState(false);
+  const [showSnapshots, setShowSnapshots] = useState(false)
+  const saveSnapshot = useChoptimaStore((s) => s.saveSnapshot)
+
+  
+  const handleSave = useCallback(() => {
+    console.log('Saving snapshot...')
+    // create a name that the snapshot explorer can parse easily
+    // call without a name so the store will use the 'checklist:snapshot:ISO' key format
+    saveSnapshot()
+  }, [saveSnapshot])
 
   return (
+    <>
     <View style={styles.container}>
 
       <View style={styles.tabsRow}>
@@ -125,6 +56,20 @@ export const ChoptimaScreen: React.FC = () => {
                 {expandAll ? 'Collapse all' : 'Expand all'}
               </Text>
             </TouchableOpacity>
+            <Pressable
+              style={[styles.toggleChecklistBtn, expandAll && styles.toggleChecklistBtnActive, { marginLeft: 10 }]}
+              onPress={handleSave}
+            >
+              <Text style={[styles.toggleChecklistText, expandAll && styles.toggleChecklistTextActive]}>
+                Save
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[styles.toggleChecklistBtn, expandAll && styles.toggleChecklistBtnActive, { marginLeft: 10 }]}
+              onPress={() => setShowSnapshots(true)}
+            >
+              <Text style={[styles.toggleChecklistText, expandAll && styles.toggleChecklistTextActive]}>Snapshots</Text>
+            </Pressable>
           </>
         )}
       </View>
@@ -139,6 +84,8 @@ export const ChoptimaScreen: React.FC = () => {
         {activeTab === 'diagrams' && <DiagramsPlaceholder />}
       </View>
     </View>
+    <SnapshotExplorer visible={showSnapshots} onClose={() => setShowSnapshots(false)} />
+    </>
   );
 }
 

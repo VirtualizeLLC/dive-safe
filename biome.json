@@ -16,33 +16,9 @@
 		"enabled": true,
 		"rules": {
 			"recommended": true,
-			    "correctness": {
-        			"noUnusedImports": "off"
-				},
-			"import/order": [
-				"error",
-				{
-					"groups": [
-						"builtin",
-						"external",
-						"internal",
-						"parent",
-						"sibling",
-						"index"
-					],
-					"pathGroups": [
-						{
-							"pattern": "@/**",
-							"group": "internal",
-							"position": "after"
-						}
-					],
-					"pathGroupsExcludedImportTypes": ["builtin"],
-					"newlines-between": "always",
-					"alphabetize": { "order": "asc", "caseInsensitive": true }
+				"correctness": {
+					"noUnusedImports": "off"
 				}
-			],
-			"sort-imports": "off"
 		}
 	},
 	"javascript": {
@@ -55,7 +31,7 @@
 		"enabled": true,
 		"actions": {
 			"source": {
-				"organizeImports": "off"
+				"organizeImports": "on"
 			}
 		}
 	}
