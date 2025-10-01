@@ -17,13 +17,13 @@ import SnapshotExplorer from '../Snapshots/SnapshotExplorer'
 import useChoptimaStore from './useChoptimaStore'
 
 type Props = {
-	checklistMode: boolean
+	hasCheckListMode: boolean
 	onToggleChecklist: () => void
 	onTogglePin?: (actionId: string) => void
 }
 
 const ActionsMenu: React.FC<Props> = memo(
-	({ checklistMode, onToggleChecklist, onTogglePin }) => {
+	({ hasCheckListMode, onToggleChecklist, onTogglePin }) => {
 		const hasAllStepsExpanded = useChoptimaStore((s) => s.hasAllStepsExpanded)
 		const setHasAllStepsExpanded = useChoptimaStore(
 			(s) => s.setHasAllStepsExpanded,
@@ -160,7 +160,7 @@ const ActionsMenu: React.FC<Props> = memo(
 												}}
 											>
 												<Text style={styles.itemText}>
-													{checklistMode
+													{hasCheckListMode
 														? 'Turn checklist OFF'
 														: 'Turn checklist ON'}
 												</Text>

@@ -1,0 +1,67 @@
+import type { ConfigContext, ExpoConfig } from '@expo/config'
+
+export default ({ config }: ConfigContext): ExpoConfig => {
+	return {
+		...config,
+		name: 'dive-safe',
+		slug: 'dive-safe',
+		version: '1.0.0',
+		orientation: 'portrait',
+		icon: './assets/images/icon.png',
+		scheme: 'divesafe',
+		userInterfaceStyle: 'automatic',
+		newArchEnabled: true,
+		ios: {
+			supportsTablet: true,
+			bundleIdentifier: 'com.virtualize.divesafe',
+		},
+		android: {
+			adaptiveIcon: {
+				backgroundColor: '#E6F4FE',
+				foregroundImage: './assets/images/android-icon-foreground.png',
+				backgroundImage: './assets/images/android-icon-background.png',
+				monochromeImage: './assets/images/android-icon-monochrome.png',
+			},
+			edgeToEdgeEnabled: true,
+			predictiveBackGestureEnabled: false,
+			package: 'com.virtualize.divesafe',
+		},
+		web: {
+			output: 'static',
+			favicon: './assets/images/favicon.png',
+		},
+		plugins: [
+			'expo-router',
+			[
+				'expo-splash-screen',
+				{
+					image: './assets/images/splash-icon.png',
+					imageWidth: 200,
+					resizeMode: 'contain',
+					backgroundColor: '#ffffff',
+					dark: {
+						backgroundColor: '#000000',
+					},
+				},
+			],
+			[
+				'expo-build-properties',
+				{
+					android: {
+						// Persist release optimizations through prebuild
+						enableProguardInReleaseBuilds: true,
+						enableShrinkResourcesInReleaseBuilds: true,
+						// Limit packaged resources to English
+						resourceConfigs: ['en'],
+					},
+				},
+			],
+			'./plugins/withArm64OnlyRelease',
+			'./plugins/withReleaseMinify',
+		],
+		experiments: {
+			typedRoutes: true,
+			reactCompiler: true,
+		},
+	}
+}

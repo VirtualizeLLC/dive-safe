@@ -1,13 +1,13 @@
-import type { ComponentMeta, ComponentStory } from '@storybook/react'
+import type { Meta, StoryFn } from '@storybook/react'
 import React from 'react'
-import ChoptimaAssembly from './ChoptimaAssembly'
+import { ChoptimaAssembly } from './ChoptimaAssembly'
 
 export default {
 	title: 'Choptima/ChoptimaAssembly',
 	component: ChoptimaAssembly,
-} as ComponentMeta<typeof ChoptimaAssembly>
+} as Meta<typeof ChoptimaAssembly>
 
-const Template: ComponentStory<typeof ChoptimaAssembly> = (args) => (
+const Template: StoryFn<typeof ChoptimaAssembly> = (args) => (
 	<ChoptimaAssembly {...args} />
 )
 

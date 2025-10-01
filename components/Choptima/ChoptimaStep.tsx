@@ -39,6 +39,8 @@ type Props = {
 	initiallyCollapsed?: boolean
 	expanded?: boolean
 	leftAccessory?: React.ReactNode
+	hasCheckListMode?: boolean
+	requiredInputs?: { id: string; label: string; placeholder?: string }[]
 }
 
 const Collapsible: React.FC<{
@@ -137,13 +139,14 @@ export const ChoptimaStep: React.FC<Props> = ({
 	title,
 	content,
 	images = [],
-	substeps = [],
+	requiredInputs = [],
 	initiallyCollapsed = true,
 	expanded,
 	leftAccessory,
 	onInputChange,
 	values,
 	checked: checkedProp,
+	hasCheckListMode,
 	onCheckedChange,
 }) => {
 	const [collapsed, setCollapsed] = useState(initiallyCollapsed)
@@ -159,12 +162,11 @@ export const ChoptimaStep: React.FC<Props> = ({
 	const parsedContent = useMemo(() => renderMarkdown(content), [content])
 
 	const requiredInputIds = useMemo(() => {
-		const ids: string[] = []
-		for (const ss of substeps) {
-			if (ss.inputs) for (const inp of ss.inputs) ids.push(inp.id)
-		}
-		return ids
-	}, [substeps])
+		if (!requiredInputs || requiredInputs.length === 0) return []
+		return requiredInputs.map((i) => i.id)
+	}, [requiredInputs])
+
+	console.log('requiredInputIds', requiredInputIds, values)
 
 	const validator = React.useCallback(() => {
 		if (requiredInputIds.length === 0) return null
@@ -190,26 +192,31 @@ export const ChoptimaStep: React.FC<Props> = ({
 				]}
 			>
 				<View style={styles.header}>
-					{leftAccessory ? (
-						<View style={styles.leftAccessory}>{leftAccessory}</View>
-					) : (
-						<View style={styles.leftAccessory}>
-							<PaperCheckbox
-								status={checked ? 'checked' : 'unchecked'}
-								onPress={() => {
-									const err = validator()
-									if (err) {
-										setHasValidationError(true)
-										return
-									}
-									const next = !checked
-									if (onCheckedChange) onCheckedChange(next)
-									else setInternalChecked(next)
-								}}
-								color="#0a84ff"
-							/>
-						</View>
-					)}
+					{hasCheckListMode &&
+						(leftAccessory ? (
+							<View style={styles.leftAccessory}>{leftAccessory}</View>
+						) : (
+							<View style={styles.leftAccessory}>
+								<PaperCheckbox
+									status={checked ? 'checked' : 'unchecked'}
+									onPress={() => {
+										const err = validator()
+										if (err) {
+											setHasValidationError(true)
+											if (collapsed) setCollapsed(false)
+											return
+										}
+										const next = !checked
+										if (next) {
+											setCollapsed(true)
+										}
+										if (onCheckedChange) onCheckedChange(next)
+										else setInternalChecked(next)
+									}}
+									color="#0a84ff"
+								/>
+							</View>
+						))}
 					<TouchableOpacity
 						onPress={() => setCollapsed((s) => !s)}
 						style={styles.headerContent}
@@ -235,7 +242,26 @@ export const ChoptimaStep: React.FC<Props> = ({
 							/>
 						))}
 
-						{substeps.length > 0 && (
+						{requiredInputs?.map((inp) => (
+							<View key={inp.id} style={{ marginTop: 6 }}>
+								<Text style={{ fontSize: 13, color: '#444' }}>{inp.label}</Text>
+								<TextInput
+									placeholder={inp.placeholder || ''}
+									style={{
+										borderWidth: 1,
+										borderColor: '#ddd',
+										padding: 8,
+										borderRadius: 6,
+										marginTop: 6,
+									}}
+									onChangeText={(t: string) => onInputChange?.(inp.id, t)}
+									value={values?.[inp.id] || ''}
+									accessibilityLabel={`${title}-${inp.id}`}
+								/>
+							</View>
+						))}
+
+						{/* {substeps.length > 0 && (
 							<View style={styles.substeps}>
 								{substeps.map((ss) => (
 									<View key={ss.id} style={{ marginBottom: 8 }}>
@@ -268,12 +294,12 @@ export const ChoptimaStep: React.FC<Props> = ({
 									</View>
 								))}
 							</View>
-						)}
+						)} */}
 					</View>
 				</Collapsible>
 			</View>
 
-			{substeps.length > 0 &&
+			{/* {substeps.length > 0 &&
 				substeps.map((ss) => (
 					<ChoptimaStep
 						key={ss.id}
@@ -283,7 +309,7 @@ export const ChoptimaStep: React.FC<Props> = ({
 						images={ss.images}
 						initiallyCollapsed={true}
 					/>
-				))}
+				))} */}
 		</View>
 	)
 }

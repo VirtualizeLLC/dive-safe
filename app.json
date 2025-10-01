@@ -40,7 +40,9 @@
 						"backgroundColor": "#000000"
 					}
 				}
-			]
+			],
+			"./plugins/withReleaseMinify.js",
+			"./plugins/withArm64OnlyRelease.js"
 		],
 		"experiments": {
 			"typedRoutes": true,

@@ -2,8 +2,9 @@ import type React from 'react'
 import { memo, useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import ActionsMenu from './ActionsMenu'
-import { AssemblyChecklistControlled } from './AssemblyChecklist'
-import ChoptimaAssembly from './ChoptimaAssembly'
+import { ChoptimaAssembly } from './ChoptimaAssembly'
+import { ChoptimaAssemblyChecklistControlled } from './ChoptimaAssemblyChecklist'
+import { ChoptimaDisassembly } from './ChoptimaDisassembly'
 import DiagramsPlaceholder from './DiagramsPlaceholder'
 import LinksTab from './LinksTab'
 import ManualsTab from './ManualsTab'
@@ -15,7 +16,7 @@ export const ChoptimaScreen: React.FC = memo(() => {
 		'assembly' | 'disassembly' | 'diagrams' | 'links' | 'manuals'
 	>('assembly')
 	// Keep checklistMode as local state (doesn't need global persistence)
-	const [checklistMode, setChecklistMode] = useState(false)
+	const [hasCheckListMode, setChecklistMode] = useState(false)
 	// pinned actions persisted in store
 	const pinnedActions = useChoptimaStore((s) => s.pinnedActions)
 	const togglePinnedAction = useChoptimaStore((s) => s.togglePinnedAction)
@@ -69,8 +70,8 @@ export const ChoptimaScreen: React.FC = memo(() => {
 						<>
 							{/* Actions button on the far left (anchor provided by ActionsMenu) */}
 							<ActionsMenu
-								checklistMode={checklistMode}
-								onToggleChecklist={() => setChecklistMode(!checklistMode)}
+								hasCheckListMode={hasCheckListMode}
+								onToggleChecklist={() => setChecklistMode(!hasCheckListMode)}
 								onTogglePin={(actionId: string) => togglePinnedAction(actionId)}
 							/>
 						</>
@@ -78,18 +79,17 @@ export const ChoptimaScreen: React.FC = memo(() => {
 				</View>
 
 				<View style={styles.content}>
-					{activeTab === 'assembly' &&
-						(checklistMode ? (
-							<AssemblyChecklistControlled />
-						) : (
-							<ChoptimaAssembly hideHeaderToggle />
-						))}
+					{activeTab === 'assembly' && (
+						<ChoptimaAssembly
+							hasCheckListMode={hasCheckListMode}
+							hideHeaderToggle
+						/>
+					)}
 					{activeTab === 'disassembly' && (
-						<View style={styles.placeholder}>
-							<Text style={styles.placeholderText}>
-								Disassembly steps not yet authored.
-							</Text>
-						</View>
+						<ChoptimaDisassembly
+							hasCheckListMode={hasCheckListMode}
+							hideHeaderToggle
+						/>
 					)}
 					{activeTab === 'diagrams' && <DiagramsPlaceholder />}
 					{activeTab === 'links' && <LinksTab />}
