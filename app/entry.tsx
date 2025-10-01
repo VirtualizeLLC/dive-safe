@@ -39,13 +39,13 @@ const Entry = () => {
 			{/* Collapsible header */}
 			{demoHeaderCollapsed ? (
 				<View style={styles.collapsedContainer} pointerEvents="box-none">
-					{/* <TouchableOpacity
+					<TouchableOpacity
 						style={styles.chevronButton}
 						onPress={() => setDemoHeaderCollapsed(false)}
 						accessibilityLabel="Expand header"
 					>
-						<Text style={styles.chevron}>Open Debug</Text>
-					</TouchableOpacity> */}
+						<Text style={styles.chevron}>UX</Text>
+					</TouchableOpacity>
 				</View>
 			) : (
 				<View style={styles.headerContainer} pointerEvents="box-none">

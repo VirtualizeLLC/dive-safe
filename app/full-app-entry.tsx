@@ -47,8 +47,9 @@ function HomeScreen() {
 export default function FullAppEntry() {
 	return (
 		<NavigationContainer>
-			<Tabs.Navigator initialRouteName="Home">
-				<Tabs.Screen name="Home" component={HomeScreen} />
+			<Tabs.Navigator initialRouteName={Screen.Overview}>
+				{/* <Tabs.Screen name="Home" component={HomeScreen} /> */}
+				<Tabs.Screen name="Overview" component={ReadmeScreen} />
 				<Tabs.Screen
 					name={Screen.Choptima}
 					component={ChoptimaScreen}
@@ -80,7 +81,6 @@ export default function FullAppEntry() {
 						),
 					}}
 				/>
-				<Tabs.Screen name="Overview" component={ReadmeScreen} />
 			</Tabs.Navigator>
 		</NavigationContainer>
 	)
