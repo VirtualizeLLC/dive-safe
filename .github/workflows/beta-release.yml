@@ -23,12 +23,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22.x'
-          cache: 'yarn'
 
       - name: Enable corepack and prepare Yarn
         run: |
           corepack enable
           corepack prepare yarn@4.10.2 --activate
+          yarn -v
 
       - name: Install dependencies
         run: yarn install --immutable
