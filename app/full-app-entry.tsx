@@ -1,17 +1,27 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { NavigationContainer, useNavigation } from '@react-navigation/native'
+import {
+	NavigationContainer,
+	type NavigationProp,
+	useNavigation,
+} from '@react-navigation/native'
 import { Image } from 'expo-image'
 import React from 'react'
-import { Button, StyleSheet, View } from 'react-native'
+import { Button, StyleSheet, Text, View } from 'react-native'
 import ChoptimaScreen from '@/components/Choptima/ChoptimaScreen'
 import ParallaxScrollView from '@/components/parallax-scroll-view'
 import ReadmeScreen from '@/components/ReadmeScreen'
 import Screen from './screens'
 
-const Tabs = createBottomTabNavigator()
+type RootTabParamList = {
+	Home: undefined
+	Choptima: undefined
+	Overview: undefined
+}
+
+const Tabs = createBottomTabNavigator<RootTabParamList>()
 
 function HomeScreen() {
-	const navigation = useNavigation()
+	const navigation = useNavigation<NavigationProp<RootTabParamList>>()
 	return (
 		<ParallaxScrollView
 			headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -26,7 +36,7 @@ function HomeScreen() {
 				<Button
 					title="Open Choptima"
 					onPress={() => {
-						navigation.navigate(Screen.Choptima as any)
+						navigation.navigate('Choptima')
 					}}
 				/>
 			</View>
@@ -39,7 +49,37 @@ export default function FullAppEntry() {
 		<NavigationContainer>
 			<Tabs.Navigator initialRouteName="Home">
 				<Tabs.Screen name="Home" component={HomeScreen} />
-				<Tabs.Screen name="Choptima" component={ChoptimaScreen} />
+				<Tabs.Screen
+					name={Screen.Choptima}
+					component={ChoptimaScreen}
+					options={{
+						headerLeft: () => {
+							return (
+								<View
+									style={{
+										flexDirection: 'row',
+										alignItems: 'center',
+										paddingLeft: 8,
+									}}
+								>
+									{/* <Text>Choptima</Text> */}
+									<Image
+										source={require('@/assets/images/choptima-image.png')}
+										style={{ width: 48, height: 48 }}
+										contentFit="contain"
+									/>
+								</View>
+							)
+						},
+						tabBarIcon: ({ size }) => (
+							<Image
+								source={require('@/assets/images/choptima-image.png')}
+								style={{ width: size ?? 26, height: size ?? 26 }}
+								contentFit="contain"
+							/>
+						),
+					}}
+				/>
 				<Tabs.Screen name="Overview" component={ReadmeScreen} />
 			</Tabs.Navigator>
 		</NavigationContainer>
