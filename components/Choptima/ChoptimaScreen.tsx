@@ -1,7 +1,6 @@
 import type React from 'react'
 import { memo, useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import useUIPreferencesStore from '@/components/ui/useUIPreferencesStore'
 import ActionsMenu from './ActionsMenu'
 import { AssemblyChecklistControlled } from './AssemblyChecklist'
 import ChoptimaAssembly from './ChoptimaAssembly'

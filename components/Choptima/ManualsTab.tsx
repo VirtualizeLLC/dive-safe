@@ -1,7 +1,8 @@
 import { Asset } from 'expo-asset'
 import type React from 'react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import PdfModal from '@/components/ui/PdfModal'
 
 // Ordered list as requested
 const MANUALS = [
@@ -30,25 +31,24 @@ const MANUALS = [
 export type ManualItem = (typeof MANUALS)[number]
 
 const ManualsTab: React.FC = () => {
-	const [openingId, setOpeningId] = useState<string | null>(null)
+	const [viewer, setViewer] = useState<{
+		title: string
+		assetId: number
+	} | null>(null)
 
-	const openManual = useCallback(async (assetId: number, id: string) => {
-		setOpeningId(id)
-		try {
-			const asset = Asset.fromModule(assetId)
-			if (!asset.downloaded) {
-				await asset.downloadAsync()
-			}
-			const link = asset.localUri ?? asset.uri
-			if (link) {
-				await Linking.openURL(link)
-			}
-		} catch {
-			// optionally surface error UI
-		} finally {
-			setOpeningId(null)
-		}
-	}, [])
+	const openManual = useCallback(
+		async (assetId: number, _id: string, title?: string) => {
+			// Preload asset for faster display in modal
+			try {
+				const asset = Asset.fromModule(assetId)
+				if (!asset.downloaded) {
+					await asset.downloadAsync()
+				}
+			} catch {}
+			setViewer({ title: title ?? 'Document', assetId })
+		},
+		[],
+	)
 
 	const openDiveRite = useCallback(async () => {
 		const url = 'https://manuals.diverite.com/'
@@ -61,39 +61,44 @@ const ManualsTab: React.FC = () => {
 	}, [])
 
 	return (
-		<View style={styles.container}>
-			<View style={styles.header}>
-				<Text style={styles.headerTitle}>Manuals</Text>
-			</View>
+		<>
+			<View style={styles.container}>
+				<View style={styles.header}>
+					<Text style={styles.headerTitle}>Manuals</Text>
+				</View>
 
-			<View style={styles.card}>
-				<Text style={styles.cardTitle}>Preloaded manuals</Text>
-				{MANUALS.map((m) => (
+				<View style={styles.card}>
+					<Text style={styles.cardTitle}>Preloaded manuals</Text>
+					{MANUALS.map((m) => (
+						<TouchableOpacity
+							key={m.id}
+							style={styles.item}
+							activeOpacity={0.8}
+							onPress={() => openManual(m.asset, m.id, m.title)}
+						>
+							<Text style={styles.itemTitle}>{m.title}</Text>
+						</TouchableOpacity>
+					))}
+				</View>
+
+				<View style={styles.card}>
+					<Text style={styles.cardTitle}>Get the latest from Dive Rite</Text>
 					<TouchableOpacity
-						key={m.id}
-						style={styles.item}
-						activeOpacity={0.8}
-						onPress={() => openManual(m.asset, m.id)}
+						style={styles.linkBtn}
+						onPress={openDiveRite}
+						activeOpacity={0.85}
 					>
-						<Text style={styles.itemTitle}>
-							{m.title}
-							{openingId === m.id ? ' (opening...)' : ''}
-						</Text>
+						<Text style={styles.linkBtnText}>Open Dive Rite Manuals</Text>
 					</TouchableOpacity>
-				))}
+				</View>
 			</View>
-
-			<View style={styles.card}>
-				<Text style={styles.cardTitle}>Get the latest from Dive Rite</Text>
-				<TouchableOpacity
-					style={styles.linkBtn}
-					onPress={openDiveRite}
-					activeOpacity={0.85}
-				>
-					<Text style={styles.linkBtnText}>Open Dive Rite Manuals</Text>
-				</TouchableOpacity>
-			</View>
-		</View>
+			<PdfModal
+				visible={!!viewer}
+				onClose={() => setViewer(null)}
+				title={viewer?.title}
+				assetId={viewer?.assetId}
+			/>
+		</>
 	)
 }
 

@@ -1,3 +1,5 @@
+import { Asset } from 'expo-asset'
+import { useState } from 'react'
 import {
 	FlatList,
 	Linking,
@@ -6,7 +8,7 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native'
-import { Asset } from 'expo-asset'
+import PdfModal from '@/components/ui/PdfModal'
 
 type LinkRef =
 	| { title: string; url: string }
@@ -26,10 +28,13 @@ const ASSET_MAP = {
 	shearwater_hud: require('@/assets/pdfs/Shearwater-HUD.pdf'),
 } as const
 
-// Load JSON data (edit assets/data/choptima-links.json to add/remove links)
-const groups: LinkGroup[] = require('@/assets/data/choptima-links.json')
+import { choptimaLinks } from '@/assets/data/choptima-links'
 
 const LinksTab: React.FC = () => {
+	const [viewer, setViewer] = useState<{
+		title: string
+		assetId: number
+	} | null>(null)
 	const openUrl = async (url: string) => {
 		try {
 			const can = await Linking.canOpenURL(url)
@@ -39,17 +44,12 @@ const LinksTab: React.FC = () => {
 		}
 	}
 
-	const openAsset = async (assetId: number) => {
+	const openAsset = async (assetId: number, title?: string) => {
 		try {
-			const asset = Asset.fromModule(assetId)
-			if (!asset.downloaded) {
-				await asset.downloadAsync()
-			}
-			const link = asset.localUri ?? asset.uri
-			if (link) await Linking.openURL(link)
-		} catch (e) {
-			console.warn('LinksTab: failed to open asset', e)
-		}
+			const a = Asset.fromModule(assetId)
+			if (!a.downloaded) await a.downloadAsync()
+		} catch {}
+		setViewer({ title: title ?? 'Document', assetId })
 	}
 
 	const displayHostname = (url: string) => {
@@ -71,15 +71,23 @@ const LinksTab: React.FC = () => {
 			</View>
 			<View style={styles.linksList}>
 				{item.links?.map((lnk) => {
-					const key = 'url' in lnk ? `${item.id}:${lnk.title}:${lnk.url}` : `${item.id}:${lnk.title}:${lnk.assetKey}`
+					const key =
+						'url' in lnk
+							? `${item.id}:${lnk.title}:${lnk.url}`
+							: `${item.id}:${lnk.title}:${lnk.assetKey}`
 					const onPress = () => {
 						if ('url' in lnk) return openUrl(lnk.url)
 						const assetId = ASSET_MAP[lnk.assetKey]
-						return openAsset(assetId)
+						return openAsset(assetId, lnk.title)
 					}
 					const host = 'url' in lnk ? displayHostname(lnk.url) : undefined
 					return (
-						<TouchableOpacity key={key} onPress={onPress} style={styles.linkRow} activeOpacity={0.85}>
+						<TouchableOpacity
+							key={key}
+							onPress={onPress}
+							style={styles.linkRow}
+							activeOpacity={0.85}
+						>
 							<Text style={styles.linkTitle}>{lnk.title}</Text>
 							{host ? <Text style={styles.linkHost}>{host}</Text> : null}
 						</TouchableOpacity>
@@ -90,14 +98,22 @@ const LinksTab: React.FC = () => {
 	)
 
 	return (
-		<View style={styles.container}>
-			<FlatList
-				data={groups}
-				keyExtractor={(i) => i.id}
-				renderItem={renderItem}
-				contentContainerStyle={styles.list}
+		<>
+			<View style={styles.container}>
+				<FlatList
+					data={choptimaLinks}
+					keyExtractor={(i) => i.id}
+					renderItem={renderItem}
+					contentContainerStyle={styles.list}
+				/>
+			</View>
+			<PdfModal
+				visible={!!viewer}
+				onClose={() => setViewer(null)}
+				title={viewer?.title}
+				assetId={viewer?.assetId}
 			/>
-		</View>
+		</>
 	)
 }
 
