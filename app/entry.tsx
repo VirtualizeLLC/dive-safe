@@ -1,37 +1,50 @@
 import React from 'react'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { useUIPreferencesStore } from '@/components/ui/useUIPreferencesStore'
 import FullAppEntry from './full-app-entry'
+import { withHocs } from './hocs/withHocs'
+import { withRootProviders } from './hocs/withRootProviders'
 import StorybookEntry from './storybook-entry'
-import { StyleSheet, View, TouchableOpacity, Text } from 'react-native'
 
 /**
  * Entry selects between the full app and storybook entry points.
  * You can toggle the entry by setting `global.__SHOW_STORYBOOK = true` before the app mounts,
  * or programmatically change which component to render here.
  */
-export default function Entry() {
-	// Default: show full app. Set global.__SHOW_STORYBOOK = true to show storybook instead.
-	const [showStorybook, setShowStorybook] = React.useState<boolean>(
-		(global as any).__SHOW_STORYBOOK === true
+const Entry = () => {
+	// Use UI preferences store for demo controls persistence
+	const demoHeaderCollapsed = useUIPreferencesStore(
+		(s) => s.demoHeaderCollapsed,
 	)
+	const setDemoHeaderCollapsed = useUIPreferencesStore(
+		(s) => s.setDemoHeaderCollapsed,
+	)
+	const showStorybook = useUIPreferencesStore((s) => s.showStorybook)
+	const setShowStorybook = useUIPreferencesStore((s) => s.setShowStorybook)
+	const loadUIPreferences = useUIPreferencesStore((s) => s.loadUIPreferences)
+
+	// Load persisted preferences on mount
+	React.useEffect(() => {
+		loadUIPreferences()
+	}, [loadUIPreferences])
 
 	// keep global flag in sync so other modules can read it if needed
 	React.useEffect(() => {
-		;(global as any).__SHOW_STORYBOOK = showStorybook === true
+		;(global as unknown as { __SHOW_STORYBOOK?: boolean }).__SHOW_STORYBOOK =
+			showStorybook === true
 	}, [showStorybook])
-
-	const [collapsed, setCollapsed] = React.useState<boolean>(false)
 
 	return (
 		<>
 			{/* Collapsible header */}
-			{collapsed ? (
+			{demoHeaderCollapsed ? (
 				<View style={styles.collapsedContainer} pointerEvents="box-none">
 					<TouchableOpacity
 						style={styles.chevronButton}
-						onPress={() => setCollapsed(false)}
+						onPress={() => setDemoHeaderCollapsed(false)}
 						accessibilityLabel="Expand header"
 					>
-						<Text style={styles.chevron}>Open Debug</Text>
+						<Text style={styles.chevron}>UX</Text>
 					</TouchableOpacity>
 				</View>
 			) : (
@@ -40,13 +53,12 @@ export default function Entry() {
 						<Text style={styles.headerTitle}>Demo Controls</Text>
 						<TouchableOpacity
 							style={styles.collapseButton}
-							onPress={() => setCollapsed(true)}
+							onPress={() => setDemoHeaderCollapsed(true)}
 							accessibilityLabel="Collapse header"
 						>
 							<Text style={styles.collapseText}>Close</Text>
 						</TouchableOpacity>
-					</View>
-
+					</View>{' '}
 					<View style={styles.headerActions}>
 						<TouchableOpacity
 							style={styles.primaryButton}
@@ -70,6 +82,12 @@ export default function Entry() {
 		</>
 	)
 }
+
+// Compose root-level HOCs here. Provide the HOCs you want to apply in order.
+// Example: withHocs(h1, h2)(Entry) => h2(h1(Entry)).
+const EnhancedEntry = withHocs(withRootProviders)(Entry)
+
+export default EnhancedEntry
 
 const styles = StyleSheet.create({
 	overlay: {

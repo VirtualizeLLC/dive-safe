@@ -1,7 +1,3 @@
-exports.platform = function () {
-  return 'react-native';
-};
+exports.platform = () => 'react-native'
 
-exports.homedir = function () {
-  return '/';
-};
+exports.homedir = () => '/'

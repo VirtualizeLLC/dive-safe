@@ -1,7 +1,5 @@
 // Minimal tty shim for React Native bundler
-exports.isatty = function () {
-  return false;
-};
+exports.isatty = () => false
 
-exports.ReadStream = function () {};
-exports.WriteStream = function () {};
+exports.ReadStream = () => {}
+exports.WriteStream = () => {}

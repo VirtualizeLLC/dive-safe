@@ -1,27 +1,27 @@
-import React from 'react';
-import { View } from 'react-native';
-import { Text } from './Text';
+import type React from 'react'
+import { View } from 'react-native'
+import { Text } from './Text'
 
 const meta = {
-  title: 'Components/Text',
-  component: Text,
-  tags: ['autodocs'],
-};
+	title: 'Components/Text',
+	component: Text,
+	tags: ['autodocs'],
+}
 
-export default meta;
+export default meta
 
 type Story = {
-  args?: any;
-  render?: (args?: any) => React.ReactNode;
-};
+	args?: any
+	render?: (args?: any) => React.ReactNode
+}
 
 export const Default: Story = {
-  args: {
-    children: 'Hello Storybook',
-  },
-  render: (args: any) => (
-    <View style={{ padding: 16 }}>
-      <Text {...args} />
-    </View>
-  ),
-};
+	args: {
+		children: 'Hello Storybook',
+	},
+	render: (args: any) => (
+		<View style={{ padding: 16 }}>
+			<Text {...args} />
+		</View>
+	),
+}

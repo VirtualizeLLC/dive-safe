@@ -1,20 +1,20 @@
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { Image } from 'expo-image';
-import React, { useMemo, useState } from 'react';
-import { Button, StyleSheet, View } from 'react-native';
+import { Image } from 'expo-image'
+import React, { useMemo, useState } from 'react'
+import { Button, StyleSheet, View } from 'react-native'
+import ParallaxScrollView from '@/components/parallax-scroll-view'
 
-const NullComponent = () => null;
+const NullComponent = () => null
 
 export default function HomeScreen() {
 	const [showStorybook, setShowStorybook] = useState(false)
 
 	const StorybookUIRoot: any = useMemo(() => {
 		if (showStorybook) {
-			const Component = require('../../.rnstorybook/index');
+			const Component = require('../../.rnstorybook/index')
 
-			console.log("DynamicRequire", Component);
+			console.log('DynamicRequire', Component)
 
-			return Component?.default ?? NullComponent; 
+			return Component?.default ?? NullComponent
 		}
 		return NullComponent
 	}, [showStorybook])
@@ -32,7 +32,10 @@ export default function HomeScreen() {
 			}
 		>
 			<View style={styles.storybookButtons}>
-				<Button title="Open Demo (Screens)" onPress={() => setShowStorybook(true)} />
+				<Button
+					title="Open Demo (Screens)"
+					onPress={() => setShowStorybook(true)}
+				/>
 			</View>
 			<View style={styles.storybookButtons}>
 				<Button title="Open Full App" onPress={() => setShowStorybook(true)} />
