@@ -38,6 +38,18 @@ export const choptimaLinks = [
 				title: 'YouTube – Dive Rite Channel',
 				url: 'https://www.youtube.com/user/diverite84',
 			},
+			{
+				title: 'Controller Options',
+				url: 'https://youtu.be/9AFvRTkI-0g',
+			},
+			{
+				title: 'How To Install a Skid Plate',
+				url: 'https://youtu.be/n8I5RgWfw2E',
+			},
+			{
+				title: 'Dive Rite DSV maintenance',
+				url: 'https://youtu.be/n8I5RgWfw2E',
+			},
 		],
 	},
 	{

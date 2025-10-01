@@ -1,3 +1,4 @@
+import Slider from '@react-native-community/slider'
 import { Asset } from 'expo-asset'
 import type React from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -11,7 +12,6 @@ import {
 	View,
 } from 'react-native'
 import Pdf from 'react-native-pdf'
-import Slider from '@react-native-community/slider'
 
 type Props = {
 	visible: boolean
@@ -37,7 +37,7 @@ const PdfModal: React.FC<Props> = ({
 	const [scale, setScale] = useState(1)
 	const [minScale] = useState(1)
 	const [maxScale] = useState(3)
-	const pdfRef = useRef<Pdf | null>(null)
+	const pdfRef = useRef<{ setPage?: (p: number) => void } | null>(null)
 
 	useEffect(() => {
 		let cancelled = false
@@ -51,9 +51,7 @@ const PdfModal: React.FC<Props> = ({
 				try {
 					setLoading(true)
 					const asset = Asset.fromModule(assetId)
-					if (!asset.downloaded) {
-						await asset.downloadAsync()
-					}
+					if (!asset.downloaded) await asset.downloadAsync()
 					const link = asset.localUri ?? asset.uri
 					if (!cancelled) setResolvedUri(link ?? null)
 				} catch {
@@ -73,109 +71,36 @@ const PdfModal: React.FC<Props> = ({
 		}
 	}, [visible, assetId, uri])
 
-	const source = useMemo(() => {
-		if (resolvedUri) return { uri: resolvedUri }
-		return undefined
-	}, [resolvedUri])
+	const source = useMemo(
+		() => (resolvedUri ? { uri: resolvedUri } : undefined),
+		[resolvedUri],
+	)
 
 	const goToPage = (p: number) => {
 		if (!totalPages) return
 		const clamped = Math.min(totalPages, Math.max(1, Math.floor(p)))
 		setPage(clamped)
-		// @ts-expect-error setPage exists on Pdf ref
 		pdfRef.current?.setPage?.(clamped)
 	}
-
 	const incPage = (delta: number) => goToPage(page + delta)
-
 	const changeScale = (delta: number) => {
-		const next = Math.max(minScale, Math.min(maxScale, Number((scale + delta).toFixed(2))))
+		const next = Math.max(
+			minScale,
+			Math.min(maxScale, Number((scale + delta).toFixed(2))),
+		)
 		setScale(next)
 	}
-
 	const resetScale = () => setScale(1)
-					<>
-						<Pdf
-							ref={(r) => (pdfRef.current = r)}
-							style={StyleSheet.absoluteFill}
-							source={source}
-							trustAllCerts={false}
-							enablePaging={false}
-							onLoadComplete={(n) => {
-								setTotalPages(n)
-								setPage(1)
-							}}
-							onPageChanged={(p) => setPage(p)}
-							onScaleChanged={(s) => setScale(s)}
-							scale={scale}
-							minScale={minScale}
-							maxScale={maxScale}
-							onError={() => setError('Failed to render PDF')}
-						/>
-						{totalPages > 0 && (
-							<View style={styles.footer}>
-								<View style={styles.footerRow}>
-									<TouchableOpacity style={styles.btnSm} onPress={() => incPage(-1)}>
-										<Text style={styles.btnSmText}>Prev</Text>
-									</TouchableOpacity>
-									<Slider
-										style={styles.slider}
-										minimumValue={1}
-										maximumValue={Math.max(1, totalPages)}
-										value={page}
-										step={1}
-										minimumTrackTintColor="#0a84ff"
-										maximumTrackTintColor="#555"
-										thumbTintColor="#0a84ff"
-										onValueChange={(v) => goToPage(v)}
-									/>
-									<TouchableOpacity style={styles.btnSm} onPress={() => incPage(1)}>
-										<Text style={styles.btnSmText}>Next</Text>
-									</TouchableOpacity>
-								</View>
-								<View style={styles.footerRow}>
-									<View style={styles.gotoGroup}>
-										<Text style={styles.gotoLabel}>Go to</Text>
-										<TextInput
-											style={styles.gotoInput}
-											keyboardType="number-pad"
-											value={gotoInput}
-											onChangeText={setGotoInput}
-											placeholder={`${page}`}
-											placeholderTextColor="#aaa"
-											onSubmitEditing={() => {
-												const num = Number(gotoInput)
-												if (!Number.isNaN(num)) goToPage(num)
-												setGotoInput('')
-											}}
-										/>
-										<TouchableOpacity
-											style={styles.btnSm}
-											onPress={() => {
-												const num = Number(gotoInput)
-												if (!Number.isNaN(num)) goToPage(num)
-												setGotoInput('')
-											}}
-										>
-											<Text style={styles.btnSmText}>Go</Text>
-										</TouchableOpacity>
-									</View>
-									<View style={styles.zoomGroup}>
-										<TouchableOpacity style={styles.btnSm} onPress={() => changeScale(-0.25)}>
-											<Text style={styles.btnSmText}>-</Text>
-										</TouchableOpacity>
-										<Text style={styles.zoomLabel}>{`${(scale * 100).toFixed(0)}%`}</Text>
-										<TouchableOpacity style={styles.btnSm} onPress={() => changeScale(0.25)}>
-											<Text style={styles.btnSmText}>+</Text>
-										</TouchableOpacity>
-										<TouchableOpacity style={styles.btnSm} onPress={resetScale}>
-											<Text style={styles.btnSmText}>Reset</Text>
-										</TouchableOpacity>
-									</View>
-								</View>
-							</View>
-						)}
-					</>
+
+	return (
+		<Modal visible={visible} animationType="slide" onRequestClose={onClose}>
+			<View style={styles.container}>
+				<View style={styles.header}>
+					<Text style={styles.title} numberOfLines={1}>
+						{title ?? 'Document'}
+					</Text>
+					<Text style={styles.pageBadge}>
+						{totalPages > 0 ? `Page ${page} / ${totalPages}` : ''}
 					</Text>
 					<TouchableOpacity onPress={onClose} style={styles.closeBtn}>
 						<Text style={styles.closeText}>Close</Text>
@@ -193,14 +118,107 @@ const PdfModal: React.FC<Props> = ({
 						</View>
 					)}
 					{!loading && !error && source && (
-						<Pdf
-							style={StyleSheet.absoluteFill}
-							source={source}
-							trustAllCerts={false}
-							enableDoubleTapZoom
-							enablePaging={false}
-							onError={() => setError('Failed to render PDF')}
-						/>
+						<>
+							<Pdf
+								ref={(r) => {
+									pdfRef.current = r
+								}}
+								style={StyleSheet.absoluteFill}
+								source={source}
+								trustAllCerts={false}
+								enablePaging={false}
+								onLoadComplete={(n) => {
+									setTotalPages(n)
+									setPage(1)
+								}}
+								onPageChanged={(p) => setPage(p)}
+								onScaleChanged={(s) => setScale(s)}
+								scale={scale}
+								minScale={minScale}
+								maxScale={maxScale}
+								onError={() => setError('Failed to render PDF')}
+							/>
+							{totalPages > 0 && (
+								<View style={styles.footer}>
+									<View style={styles.footerRow}>
+										<TouchableOpacity
+											style={styles.btnSm}
+											onPress={() => incPage(-1)}
+										>
+											<Text style={styles.btnSmText}>Prev</Text>
+										</TouchableOpacity>
+										<Slider
+											style={styles.slider}
+											minimumValue={1}
+											maximumValue={Math.max(1, totalPages)}
+											value={page}
+											step={1}
+											minimumTrackTintColor="#0a84ff"
+											maximumTrackTintColor="#555"
+											thumbTintColor="#0a84ff"
+											onValueChange={(v) => goToPage(v)}
+										/>
+										<TouchableOpacity
+											style={styles.btnSm}
+											onPress={() => incPage(1)}
+										>
+											<Text style={styles.btnSmText}>Next</Text>
+										</TouchableOpacity>
+									</View>
+									<View style={styles.footerRow}>
+										<View style={styles.gotoGroup}>
+											<Text style={styles.gotoLabel}>Go to</Text>
+											<TextInput
+												style={styles.gotoInput}
+												keyboardType="number-pad"
+												value={gotoInput}
+												onChangeText={setGotoInput}
+												placeholder={`${page}`}
+												placeholderTextColor="#aaa"
+												onSubmitEditing={() => {
+													const num = Number(gotoInput)
+													if (!Number.isNaN(num)) goToPage(num)
+													setGotoInput('')
+												}}
+											/>
+											<TouchableOpacity
+												style={styles.btnSm}
+												onPress={() => {
+													const num = Number(gotoInput)
+													if (!Number.isNaN(num)) goToPage(num)
+													setGotoInput('')
+												}}
+											>
+												<Text style={styles.btnSmText}>Go</Text>
+											</TouchableOpacity>
+										</View>
+										<View style={styles.zoomGroup}>
+											<TouchableOpacity
+												style={styles.btnSm}
+												onPress={() => changeScale(-0.25)}
+											>
+												<Text style={styles.btnSmText}>-</Text>
+											</TouchableOpacity>
+											<Text
+												style={styles.zoomLabel}
+											>{`${(scale * 100).toFixed(0)}%`}</Text>
+											<TouchableOpacity
+												style={styles.btnSm}
+												onPress={() => changeScale(0.25)}
+											>
+												<Text style={styles.btnSmText}>+</Text>
+											</TouchableOpacity>
+											<TouchableOpacity
+												style={styles.btnSm}
+												onPress={resetScale}
+											>
+												<Text style={styles.btnSmText}>Reset</Text>
+											</TouchableOpacity>
+										</View>
+									</View>
+								</View>
+							)}
+						</>
 					)}
 				</View>
 			</View>
@@ -225,6 +243,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		marginRight: 8,
 	},
+	pageBadge: { color: '#ddd', fontSize: 12, marginRight: 12 },
 	closeBtn: {
 		paddingHorizontal: 10,
 		paddingVertical: 6,
@@ -258,18 +277,9 @@ const styles = StyleSheet.create({
 		borderRadius: 6,
 	},
 	btnSmText: { color: '#fff', fontWeight: '600' },
-	zoomGroup: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: 8,
-	},
+	zoomGroup: { flexDirection: 'row', alignItems: 'center', gap: 8 },
 	zoomLabel: { color: '#fff', width: 48, textAlign: 'center' },
-	gotoGroup: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: 6,
-		flex: 1,
-	},
+	gotoGroup: { flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1 },
 	gotoLabel: { color: '#fff' },
 	gotoInput: {
 		backgroundColor: '#222',
@@ -279,6 +289,7 @@ const styles = StyleSheet.create({
 		borderRadius: 6,
 		minWidth: 64,
 	},
+	// (deduplicated style keys above)
 })
 
 export default PdfModal
