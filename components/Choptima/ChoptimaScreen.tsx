@@ -6,12 +6,13 @@ import ActionsMenu from './ActionsMenu'
 import { AssemblyChecklistControlled } from './AssemblyChecklist'
 import ChoptimaAssembly from './ChoptimaAssembly'
 import DiagramsPlaceholder from './DiagramsPlaceholder'
+import LinksTab from './LinksTab'
 import TabButton from './TabButton'
 import useChoptimaStore from './useChoptimaStore'
 
 export const ChoptimaScreen: React.FC = memo(() => {
 	const [activeTab, setActiveTab] = useState<
-		'assembly' | 'disassembly' | 'diagrams'
+		'assembly' | 'disassembly' | 'diagrams' | 'links'
 	>('assembly')
 	// Keep checklistMode as local state (doesn't need global persistence)
 	const [checklistMode, setChecklistMode] = useState(false)
@@ -50,6 +51,11 @@ export const ChoptimaScreen: React.FC = memo(() => {
 						active={activeTab === 'diagrams'}
 						onPress={() => setActiveTab('diagrams')}
 					/>
+					<TabButton
+						label="Links"
+						active={activeTab === 'links'}
+						onPress={() => setActiveTab('links')}
+					/>
 				</View>
 
 				{/* Compact Actions button that opens the actions menu */}
@@ -81,6 +87,7 @@ export const ChoptimaScreen: React.FC = memo(() => {
 						</View>
 					)}
 					{activeTab === 'diagrams' && <DiagramsPlaceholder />}
+					{activeTab === 'links' && <LinksTab />}
 				</View>
 			</View>
 			{/* ActionsMenu anchor is rendered in the controls row above */}

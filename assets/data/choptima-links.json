@@ -1,0 +1,32 @@
+[
+	{
+		"id": "diverite-main",
+		"title": "Dive Rite",
+		"url": "https://www.diverite.com/",
+		"description": "Manufacturer website"
+	},
+	{
+		"id": "optima-overview",
+		"title": "Dive Rite - O2ptima CM Overview",
+		"url": "https://diverite.com/products/o2ptima/o2ptima-cm/",
+		"description": "Product overview"
+	},
+	{
+		"id": "manuals",
+		"title": "Dive Rite - Manuals",
+		"url": "https://manuals.diverite.com/",
+		"description": "Manuals"
+	},
+	{
+		"id": "videos",
+		"title": "Dive Rite - Videos",
+		"url": "https://manuals.diverite.com/",
+		"description": "Manuals"
+	},
+	{
+		"id": "choptima-unofficial-manuals",
+		"title": "Choptima.com",
+		"url": "https://choptima.com",
+		"description": "Unofficial Choptima site for manuals, instructors, training, gallery, service, parts etc"
+	}
+]
