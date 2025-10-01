@@ -31,6 +31,8 @@ const MAPPING = {
 	clock: 'history',
 	// pin/bookmark
 	pin: 'push-pin',
+	// new/add
+	plus: 'add',
 } as IconMapping
 
 /**

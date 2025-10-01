@@ -12,6 +12,10 @@ type ChecklistItemState = {
 type ChoptimaState = {
 	// current in-memory items for the active namespace
 	items: Record<string, ChecklistItemState>
+	// baseline of items from the last loaded/saved snapshot to detect unsaved changes
+	snapshotBaseline?: Record<string, ChecklistItemState> | null
+	// baseline of expand state from the last loaded/saved snapshot
+	snapshotBaselineExpand?: boolean
 	// current namespace (e.g., rebreather model or id)
 	namespace?: string
 	setNamespace: (ns?: string) => void
@@ -20,10 +24,14 @@ type ChoptimaState = {
 	setField: (id: string, fieldId: string, value: string) => void
 	removeItem: (id: string) => void
 	clear: () => void
+	// create a new, blank sheet and set a proposed name
+	startNewSheet: (name?: string) => void
 	saveSnapshot: (name?: string) => void
 	listNamespaces: () => string[]
 	listSnapshots: () => string[]
 	loadSnapshot: (key: string) => void
+	// determine if there are unsaved changes relative to last snapshot baseline
+	hasUnsavedChanges: () => boolean
 	// pinned UI actions persisted to MMKV
 	pinnedActions: string[]
 	setPinnedActions: (ids: string[]) => void
@@ -102,6 +110,8 @@ function pinnedStorageKey(ns?: string) {
 
 export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 	items: {},
+	snapshotBaseline: null,
+	snapshotBaselineExpand: false,
 	namespace: undefined,
 	pinnedActions: [],
 	loadedSnapshotName: undefined,
@@ -255,6 +265,25 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 		})
 	},
 
+	startNewSheet: (name) => {
+		// create a new blank in-memory sheet, reset expand state, and set a proposed name
+		try {
+			// clear persisted namespace data and in-memory items
+			get().clear()
+			const safeName = name
+				? String(name).trim().replace(/\s+/g, '_')
+			: undefined
+			set({
+				loadedSnapshotName: safeName,
+				hasAllStepsExpanded: false,
+				snapshotBaseline: {}, // baseline equals current items (empty)
+				snapshotBaselineExpand: false,
+			})
+		} catch (e) {
+			console.warn('useChoptimaStore: failed to start new sheet', e)
+		}
+	},
+
 	saveSnapshot: (name) => {
 		// Always write snapshots under the canonical prefix so explorers and lists can find them.
 		try {
@@ -290,7 +319,11 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 			) // debug log
 			ChecklistStorage.set(snapshotKey, data)
 			// record the loaded snapshot name when saving
-			set({ loadedSnapshotName: safeName })
+			set({
+				loadedSnapshotName: safeName,
+				snapshotBaseline: { ...state.items },
+				snapshotBaselineExpand: state.hasAllStepsExpanded,
+			})
 		} catch (e) {
 			console.warn('useChoptimaStore: failed to save snapshot', e)
 		}
@@ -330,14 +363,23 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 				console.log('loadsnapshot parsed data', { parsed })
 				if (parsed.items) {
 					// New format with checklist state
+					const nextItems = parsed.items || {}
 					set({
-						items: parsed.items || {},
+						items: nextItems,
 						hasAllStepsExpanded:
+							parsed.hasAllStepsExpanded || parsed.expandAll || false,
+						snapshotBaseline: { ...nextItems },
+						snapshotBaselineExpand:
 							parsed.hasAllStepsExpanded || parsed.expandAll || false,
 					})
 				} else {
 					// Old format (items only)
-					set({ items: parsed })
+					const nextItems = parsed
+					set({
+						items: nextItems,
+						snapshotBaseline: { ...nextItems },
+						snapshotBaselineExpand: false,
+					})
 				}
 			}
 
@@ -353,6 +395,44 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 			}
 		} catch (e) {
 			console.warn('useChoptimaStore: failed to load snapshot', key, e)
+		}
+	},
+
+	// compare current items to snapshot baseline to detect unsaved changes
+		hasUnsavedChanges: () => {
+		try {
+			const { items, snapshotBaseline, hasAllStepsExpanded, snapshotBaselineExpand } = get()
+			// if baseline not set, consider dirty when there is any content
+			if (!snapshotBaseline) {
+				return (
+					Object.keys(items || {}).length > 0 || hasAllStepsExpanded === true
+				)
+			}
+			const a = items || {}
+			const b = snapshotBaseline || {}
+			// fast path by reference
+			if (a === b) return false
+			// shallow size check
+			const aKeys = Object.keys(a)
+			const bKeys = Object.keys(b)
+			if (aKeys.length !== bKeys.length) return true
+			// deep compare entries
+			for (const k of aKeys) {
+				const av = a[k]
+				const bv = b[k]
+				if (!bv) return true
+				const avStr = JSON.stringify(av)
+				const bvStr = JSON.stringify(bv)
+				if (avStr !== bvStr) return true
+			}
+			// finally compare expand baseline
+			if ((snapshotBaselineExpand || false) !== (hasAllStepsExpanded || false)) {
+				return true
+			}
+			return false
+		} catch (e) {
+			console.warn('useChoptimaStore: hasUnsavedChanges check failed', e)
+			return false
 		}
 	},
 }))

@@ -33,10 +33,12 @@ const ActionsMenu: React.FC<Props> = memo(
 		const [editing, setEditing] = useState(false)
 
 		const saveSnapshot = useChoptimaStore((s) => s.saveSnapshot)
+		const startNewSheet = useChoptimaStore((s) => s.startNewSheet)
 		const loadedSnapshotName = useChoptimaStore((s) => s.loadedSnapshotName)
 		const setLoadedSnapshotName = useChoptimaStore(
 			(s) => s.setLoadedSnapshotName,
 		)
+		const hasUnsavedChanges = useChoptimaStore((s) => s.hasUnsavedChanges)
 
 		const saveName = useMemo(() => {
 			if (loadedSnapshotName) return loadedSnapshotName.replace(/_/g, ' ')
@@ -48,6 +50,28 @@ const ActionsMenu: React.FC<Props> = memo(
 		const handleSave = useCallback(() => {
 			saveSnapshot(nameInput.current?.trim() || undefined)
 		}, [saveSnapshot])
+
+		const confirmAndNewSheet = useCallback(() => {
+			const proceed = () => {
+				const suggested = DateTime.now().toFormat('yyyy-LL-dd_HH:mm')
+				startNewSheet(suggested)
+				// Update local input and close menus
+				nameInput.current = suggested
+				setVisible(false)
+			}
+			if (hasUnsavedChanges()) {
+				Alert.alert(
+					'Unsaved changes',
+					'Starting a new sheet will discard unsaved changes. Continue?',
+					[
+						{ text: 'Cancel', style: 'cancel' },
+						{ text: 'Start new', style: 'destructive', onPress: proceed },
+					],
+				)
+			} else {
+				proceed()
+			}
+		}, [hasUnsavedChanges, startNewSheet])
 		const pinnedActions = useChoptimaStore((s) => s.pinnedActions)
 
 		const setNameInput = useCallback((val: string) => {
@@ -99,6 +123,32 @@ const ActionsMenu: React.FC<Props> = memo(
 									}
 								>
 									<View style={styles.menuContent}>
+										{/* New sheet */}
+										<View style={styles.itemRow}>
+											<TouchableOpacity
+												style={styles.itemAction}
+												onPress={confirmAndNewSheet}
+											>
+												<Text style={styles.itemText}>New sheet</Text>
+											</TouchableOpacity>
+											<TouchableOpacity
+												style={styles.pin}
+												onPress={(e: GestureResponderEvent) => {
+													e.stopPropagation()
+													onTogglePin?.('new_sheet')
+												}}
+												accessibilityLabel="Pin new sheet"
+											>
+												<IconSymbol
+													name={'pin'}
+													size={18}
+													color={
+														pinnedActions?.includes('new_sheet') ? '#ff9800' : '#888'
+													}
+												/>
+											</TouchableOpacity>
+										</View>
+
 										<View style={styles.itemRow}>
 											<TouchableOpacity
 												style={styles.itemAction}
@@ -236,6 +286,14 @@ const ActionsMenu: React.FC<Props> = memo(
 						contentContainerStyle={styles.pinnedRow}
 						style={styles.pinnedScroll}
 					>
+						{pinnedActions?.includes('new_sheet') && (
+							<IconBtn
+								name="plus"
+								onPress={confirmAndNewSheet}
+								onLongPress={() => Alert.alert('New sheet')}
+								accessibilityLabel="New sheet"
+							/>
+						)}
 						{pinnedActions?.includes('toggle_checklist') && (
 							<IconBtn
 								name="checkmark.square.fill"
