@@ -8,6 +8,7 @@ import {
 	View,
 } from 'react-native'
 import ChoptimaStep from './ChoptimaStep'
+import useChoptimaStore from './useChoptimaStore'
 
 export type AssemblyStep = {
 	id: string
@@ -293,24 +294,21 @@ export const sampleSteps: AssemblyStep[] = [
 
 export const ChoptimaAssembly: React.FC<{
 	steps?: AssemblyStep[]
-	hasAllStepsExpanded?: boolean
-	onToggleExpandAll?: (v: boolean) => void
 	hideHeaderToggle?: boolean
-}> = ({
-	steps = sampleSteps,
-	hasAllStepsExpanded,
-	onToggleExpandAll,
-	hideHeaderToggle,
-}) => {
-	const [localExpandAll, setLocalExpandAll] = useState(false)
+}> = ({ steps = sampleSteps, hideHeaderToggle }) => {
+	// Wire to checklist store so guide reflects saved/loaded state
+	const items = useChoptimaStore((s) => s.items)
+	const setItem = useChoptimaStore((s) => s.setItem)
+	const setField = useChoptimaStore((s) => s.setField)
+	const hasAllStepsExpanded = useChoptimaStore((s) => s.hasAllStepsExpanded)
+	const setHasAllStepsExpanded = useChoptimaStore(
+		(s) => s.setHasAllStepsExpanded,
+	)
 
-	const actualExpandAll =
-		typeof hasAllStepsExpanded === 'boolean' ? hasAllStepsExpanded : localExpandAll
+	const actualExpandAll = hasAllStepsExpanded
 
 	const handleToggle = () => {
-		const next = !actualExpandAll
-		if (onToggleExpandAll) onToggleExpandAll(next)
-		else setLocalExpandAll(next)
+		setHasAllStepsExpanded(!hasAllStepsExpanded)
 	}
 
 	return (
@@ -336,6 +334,12 @@ export const ChoptimaAssembly: React.FC<{
 						images={s.images}
 						expanded={actualExpandAll}
 						initiallyCollapsed={!actualExpandAll}
+						checked={!!items[s.id]?.checked}
+						onCheckedChange={(next) => setItem(s.id, { checked: next })}
+						values={items[s.id]?.values}
+						onInputChange={(inputId: string, value: string) =>
+							setField(s.id, inputId, value)
+						}
 					/>
 				))}
 			</View>

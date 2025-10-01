@@ -314,6 +314,7 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 
 			// Handle both old format (items only) and new format (with checklist state)
 			if (parsed && typeof parsed === 'object') {
+				console.log('loadsnapshot parsed data', { parsed })
 				if (parsed.items) {
 					// New format with checklist state
 					set({

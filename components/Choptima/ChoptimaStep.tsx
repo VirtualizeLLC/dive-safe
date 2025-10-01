@@ -7,6 +7,7 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native'
+import { Checkbox as PaperCheckbox } from 'react-native-paper'
 import Animated, {
 	Easing as ReEasing,
 	useAnimatedStyle,
@@ -193,18 +194,19 @@ export const ChoptimaStep: React.FC<Props> = ({
 						<View style={styles.leftAccessory}>{leftAccessory}</View>
 					) : (
 						<View style={styles.leftAccessory}>
-							<CheckboxInternalState
-								isChecked={checked}
-								onPress={(next) => {
+							<PaperCheckbox
+								status={checked ? 'checked' : 'unchecked'}
+								onPress={() => {
 									const err = validator()
 									if (err) {
 										setHasValidationError(true)
 										return
 									}
+									const next = !checked
 									if (onCheckedChange) onCheckedChange(next)
 									else setInternalChecked(next)
 								}}
-								validator={validator}
+								color="#0a84ff"
 							/>
 						</View>
 					)}

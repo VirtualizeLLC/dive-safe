@@ -19,20 +19,15 @@ import useChoptimaStore from './useChoptimaStore'
 type Props = {
 	checklistMode: boolean
 	onToggleChecklist: () => void
-	hasAllStepsExpanded: boolean
-	onToggleExpandAll: () => void
-	// removed unused setters; use onToggleChecklist/onToggleExpandAll callbacks
 	onTogglePin?: (actionId: string) => void
 }
 
 const ActionsMenu: React.FC<Props> = memo(
-	({
-		checklistMode,
-		onToggleChecklist,
-		hasAllStepsExpanded,
-		onToggleExpandAll,
-		onTogglePin,
-	}) => {
+	({ checklistMode, onToggleChecklist, onTogglePin }) => {
+		const hasAllStepsExpanded = useChoptimaStore((s) => s.hasAllStepsExpanded)
+		const setHasAllStepsExpanded = useChoptimaStore(
+			(s) => s.setHasAllStepsExpanded,
+		)
 		const [showSnapshots, setShowSnapshots] = useState(false)
 		const [visible, setVisible] = useState(false)
 		const [editing, setEditing] = useState(false)
@@ -142,7 +137,7 @@ const ActionsMenu: React.FC<Props> = memo(
 											<TouchableOpacity
 												style={styles.itemAction}
 												onPress={() => {
-													onToggleExpandAll()
+													setHasAllStepsExpanded(!hasAllStepsExpanded)
 													setVisible(false)
 												}}
 											>
@@ -252,7 +247,7 @@ const ActionsMenu: React.FC<Props> = memo(
 						{pinnedActions?.includes('toggle_expand') && (
 							<IconBtn
 								name="chevron.left.forwardslash.chevron.right"
-								onPress={onToggleExpandAll}
+								onPress={() => setHasAllStepsExpanded(!hasAllStepsExpanded)}
 								onLongPress={() => Alert.alert('Toggle expand/collapse')}
 								accessibilityLabel="Toggle expand/collapse"
 							/>

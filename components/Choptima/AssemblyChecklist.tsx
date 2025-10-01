@@ -11,6 +11,7 @@ export const AssemblyChecklist: React.FC = () => {
 	const setField = useChoptimaStore((s) => s.setField)
 
 	const handleToggle = (id: string, isChecked: boolean) => {
+		console.log('called handleToggle', id, isChecked)
 		setItem(id, { checked: isChecked })
 	}
 
@@ -57,15 +58,11 @@ export const AssemblyChecklist: React.FC = () => {
 	)
 }
 
-interface AssemblyChecklistProps {
-	expandAll?: boolean
-}
-export const AssemblyChecklistControlled: React.FC<AssemblyChecklistProps> = ({
-	expandAll,
-}) => {
+export const AssemblyChecklistControlled: React.FC = () => {
 	const items = useChoptimaStore((s) => s.items)
 	const setItem = useChoptimaStore((s) => s.setItem)
 	const setField = useChoptimaStore((s) => s.setField)
+	const hasAllStepsExpanded = useChoptimaStore((s) => s.hasAllStepsExpanded)
 
 	const handleToggle = (id: string, isChecked: boolean) => {
 		setItem(id, { checked: isChecked })
@@ -108,8 +105,8 @@ export const AssemblyChecklistControlled: React.FC<AssemblyChecklistProps> = ({
 					onInputChange={(inputId: string, value: string) =>
 						setField(step.id, inputId, value)
 					}
-					expanded={expandAll}
-					initiallyCollapsed={!expandAll}
+					expanded={hasAllStepsExpanded}
+					initiallyCollapsed={!hasAllStepsExpanded}
 				/>
 			))}
 		</ScrollView>

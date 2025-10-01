@@ -15,11 +15,6 @@ export const ChoptimaScreen: React.FC = memo(() => {
 	>('assembly')
 	// Keep checklistMode as local state (doesn't need global persistence)
 	const [checklistMode, setChecklistMode] = useState(false)
-	// Use Choptima store for hasAllStepsExpanded since it's checklist-specific
-	const hasAllStepsExpanded = useChoptimaStore((s) => s.hasAllStepsExpanded)
-	const setHasAllStepsExpanded = useChoptimaStore(
-		(s) => s.setHasAllStepsExpanded,
-	)
 	// pinned actions persisted in store
 	const pinnedActions = useChoptimaStore((s) => s.pinnedActions)
 	const togglePinnedAction = useChoptimaStore((s) => s.togglePinnedAction)
@@ -65,10 +60,6 @@ export const ChoptimaScreen: React.FC = memo(() => {
 							<ActionsMenu
 								checklistMode={checklistMode}
 								onToggleChecklist={() => setChecklistMode(!checklistMode)}
-								hasAllStepsExpanded={hasAllStepsExpanded}
-								onToggleExpandAll={() =>
-									setHasAllStepsExpanded(!hasAllStepsExpanded)
-								}
 								onTogglePin={(actionId: string) => togglePinnedAction(actionId)}
 							/>
 						</>
@@ -78,12 +69,9 @@ export const ChoptimaScreen: React.FC = memo(() => {
 				<View style={styles.content}>
 					{activeTab === 'assembly' &&
 						(checklistMode ? (
-							<AssemblyChecklistControlled expandAll={hasAllStepsExpanded} />
+							<AssemblyChecklistControlled />
 						) : (
-							<ChoptimaAssembly
-								hasAllStepsExpanded={hasAllStepsExpanded}
-								hideHeaderToggle
-							/>
+							<ChoptimaAssembly hideHeaderToggle />
 						))}
 					{activeTab === 'disassembly' && (
 						<View style={styles.placeholder}>

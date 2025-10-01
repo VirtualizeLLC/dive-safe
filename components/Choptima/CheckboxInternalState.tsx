@@ -57,7 +57,6 @@ const CheckboxInternalState: FC<Props> = ({
 			<PaperCheckbox
 				status={checked ? 'checked' : 'unchecked'}
 				onPress={handlePress}
-				accessibilityLabel="Checklist step checkbox"
 				color="#0a84ff"
 			/>
 			{error ? <Text style={styles.error}>{error}</Text> : null}
