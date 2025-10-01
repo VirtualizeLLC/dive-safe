@@ -1,3 +1,4 @@
+import { MaterialIcons } from '@expo/vector-icons'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import {
 	NavigationContainer,
@@ -12,11 +13,7 @@ import ParallaxScrollView from '@/components/parallax-scroll-view'
 import ReadmeScreen from '@/components/ReadmeScreen'
 import Screen from './screens'
 
-type RootTabParamList = {
-	Home: undefined
-	Choptima: undefined
-	Overview: undefined
-}
+type RootTabParamList = Record<keyof typeof Screen, undefined>
 
 const Tabs = createBottomTabNavigator<RootTabParamList>()
 
@@ -47,9 +44,34 @@ function HomeScreen() {
 export default function FullAppEntry() {
 	return (
 		<NavigationContainer>
-			<Tabs.Navigator initialRouteName={Screen.Overview}>
+			<Tabs.Navigator initialRouteName={Screen.Info}>
 				{/* <Tabs.Screen name="Home" component={HomeScreen} /> */}
-				<Tabs.Screen name="Overview" component={ReadmeScreen} />
+				<Tabs.Screen
+					name={Screen.Info}
+					component={ReadmeScreen}
+					options={{
+						headerLeft: () => {
+							return (
+								<View
+									style={{
+										flexDirection: 'row',
+										alignItems: 'center',
+										paddingLeft: 8,
+									}}
+								>
+									<MaterialIcons name="info-outline" size={26} color={'#000'} />
+								</View>
+							)
+						},
+						tabBarIcon: ({ color, size }) => (
+							<MaterialIcons
+								name="info-outline"
+								size={size ?? 26}
+								color={color}
+							/>
+						),
+					}}
+				/>
 				<Tabs.Screen
 					name={Screen.Choptima}
 					component={ChoptimaScreen}
@@ -63,7 +85,6 @@ export default function FullAppEntry() {
 										paddingLeft: 8,
 									}}
 								>
-									{/* <Text>Choptima</Text> */}
 									<Image
 										source={require('@/assets/images/choptima-image.png')}
 										style={{ width: 48, height: 48 }}

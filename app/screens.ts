@@ -1,7 +1,7 @@
 export enum Screen {
 	Home = 'Home',
 	Choptima = 'Choptima',
-	Overview = 'Overview',
+	Info = 'Info',
 }
 
 export default Screen
