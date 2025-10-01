@@ -1,0 +1,105 @@
+name: Beta Release (Android)
+
+on:
+  workflow_dispatch:
+    inputs:
+      tagSuffix:
+        description: Optional custom suffix to append to the version (defaults to run number)
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'yarn'
+
+      - name: Enable corepack and prepare Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@4.10.2 --activate
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Setup Java (JDK 17)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Read package version
+        id: pkg
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Compute tag
+        id: tag
+        run: |
+          if [ -n "${{ github.event.inputs.tagSuffix }}" ]; then
+            echo "tag=v${{ steps.pkg.outputs.version }}-beta.${{ github.event.inputs.tagSuffix }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=v${{ steps.pkg.outputs.version }}-beta.${{ github.run_number }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build Android APK (release)
+        run: yarn build:android:apk
+
+      - name: Build Android AAB (release bundle)
+        run: yarn build:android:aab
+
+      - name: Locate APK/AAB
+        id: find_outputs
+        run: |
+          APK_PATH="android/app/build/outputs/apk/release/app-release.apk"
+          if [ ! -f "$APK_PATH" ]; then
+            echo "APK not found at $APK_PATH" >&2
+            exit 1
+          fi
+          echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
+          AAB_PATH="android/app/build/outputs/bundle/release/app-release.aab"
+          if [ -f "$AAB_PATH" ]; then
+            echo "aab_path=$AAB_PATH" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload artifact (APK)
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: ${{ steps.find_outputs.outputs.apk_path }}
+
+      # - name: Upload artifact (AAB)
+      #   if: ${{ steps.find_outputs.outputs.aab_path }}
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: app-release-aab
+      #     path: ${{ steps.find_outputs.outputs.aab_path }}
+
+      - name: Create GitHub Release and upload APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: Beta ${{ steps.pkg.outputs.version }} (${{ github.run_number }})
+          draft: false
+          prerelease: true
+          files: |
+            ${{ steps.find_outputs.outputs.apk_path }}
+            ${{ steps.find_outputs.outputs.aab_path }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
