@@ -7,6 +7,7 @@ import {
 	Text,
 	TextInput,
 	TouchableOpacity,
+	TouchableWithoutFeedback,
 	View,
 } from 'react-native'
 import { ChecklistStorage } from '@/app/storage/ChecklistStorage'
@@ -48,6 +49,12 @@ const SnapshotExplorer: React.FC<{ visible: boolean; onClose: () => void }> = ({
 	type SortDir = 'asc' | 'desc'
 	const [sortBy, setSortBy] = useState<SortBy>('createdAt')
 	const [sortDir, setSortDir] = useState<SortDir>('desc')
+	const [sortPickerVisible, setSortPickerVisible] = useState(false)
+	const sortLabelMap: Record<SortBy, string> = {
+		name: 'Name',
+		createdAt: 'Created',
+		updatedAt: 'Updated',
+	}
 
 	const refresh = React.useCallback(() => {
 		try {
@@ -252,46 +259,68 @@ const SnapshotExplorer: React.FC<{ visible: boolean; onClose: () => void }> = ({
 
 				{/* sorting UI */}
 				<View style={styles.sortRow}>
-					<Text style={styles.sortLabel}>Sort by:</Text>
-					<TouchableOpacity onPress={() => setSortBy('name')}>
-						<Text
-							style={[
-								styles.sortOption,
-								sortBy === 'name' && styles.sortActive,
-							]}
+					<View style={styles.sortLeft}>
+						<Text style={styles.sortLabel}>Sort by:</Text>
+						<TouchableOpacity
+							onPress={() => setSortPickerVisible(true)}
+							style={[styles.sortChip, styles.sortSelectBtn]}
+							accessibilityLabel="Select sort field"
 						>
-							Name
-						</Text>
-					</TouchableOpacity>
-					<TouchableOpacity onPress={() => setSortBy('createdAt')}>
-						<Text
-							style={[
-								styles.sortOption,
-								sortBy === 'createdAt' && styles.sortActive,
-							]}
-						>
-							Created
-						</Text>
-					</TouchableOpacity>
-					<TouchableOpacity onPress={() => setSortBy('updatedAt')}>
-						<Text
-							style={[
-								styles.sortOption,
-								sortBy === 'updatedAt' && styles.sortActive,
-							]}
-						>
-							Updated
-						</Text>
-					</TouchableOpacity>
-					<View style={{ flex: 1 }} />
+							<Text style={styles.sortChipText}>{sortLabelMap[sortBy]}</Text>
+						</TouchableOpacity>
+					</View>
 					<TouchableOpacity
 						onPress={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
+						style={[styles.sortChip, styles.sortDirChip]}
 					>
-						<Text style={styles.sortDir}>
+						<Text style={[styles.sortChipText, styles.sortDir]}>
 							{sortDir === 'asc' ? 'ASC ↑' : 'DESC ↓'}
 						</Text>
 					</TouchableOpacity>
 				</View>
+
+				{/* sort field picker modal */}
+				<Modal
+					visible={sortPickerVisible}
+					transparent
+					animationType="fade"
+					onRequestClose={() => setSortPickerVisible(false)}
+				>
+					<TouchableWithoutFeedback onPress={() => setSortPickerVisible(false)}>
+						<View style={styles.overlay}>
+							<TouchableWithoutFeedback>
+								<View style={styles.pickerContainer}>
+									<Text style={styles.pickerTitle}>Sort by</Text>
+									{(['name', 'createdAt', 'updatedAt'] as SortBy[]).map(
+										(opt) => (
+											<TouchableOpacity
+												key={opt}
+												style={styles.pickerItem}
+												onPress={() => {
+													setSortBy(opt)
+													setSortPickerVisible(false)
+												}}
+												accessibilityLabel={`Sort by ${sortLabelMap[opt]}`}
+											>
+												<Text
+													style={[
+														styles.pickerItemText,
+														opt === sortBy && styles.pickerItemTextActive,
+													]}
+												>
+													{sortLabelMap[opt]}
+												</Text>
+												{opt === sortBy ? (
+													<Text style={styles.pickerCheck}>✓</Text>
+												) : null}
+											</TouchableOpacity>
+										),
+									)}
+								</View>
+							</TouchableWithoutFeedback>
+						</View>
+					</TouchableWithoutFeedback>
+				</Modal>
 
 				{items.length === 0 ? (
 					<View style={styles.empty}>
@@ -330,11 +359,65 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 		paddingVertical: 8,
 		gap: 12,
+		justifyContent: 'space-between',
+	},
+	sortLeft: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 8,
+		flexShrink: 1,
 	},
 	sortLabel: { fontWeight: '700', marginRight: 8 },
-	sortOption: { marginRight: 12, color: '#333' },
-	sortActive: { textDecorationLine: 'underline' },
-	sortDir: { fontWeight: '600', color: '#0a84ff' },
+	sortChip: {
+		paddingHorizontal: 10,
+		paddingVertical: 6,
+		borderRadius: 16,
+		backgroundColor: '#f2f2f4',
+		borderWidth: 1,
+		borderColor: '#e2e2e6',
+		marginRight: 8,
+	},
+	sortChipText: { color: '#333', fontWeight: '600' },
+	sortDir: { fontWeight: '700' },
+	sortDirChip: { paddingHorizontal: 12 },
+	sortSelectBtn: { flexShrink: 1 },
+	overlay: {
+		flex: 1,
+		backgroundColor: 'rgba(0,0,0,0.25)',
+		justifyContent: 'center',
+		alignItems: 'center',
+		padding: 24,
+	},
+	pickerContainer: {
+		width: '100%',
+		maxWidth: 360,
+		backgroundColor: '#fff',
+		borderRadius: 12,
+		paddingVertical: 8,
+		paddingHorizontal: 8,
+		shadowColor: '#000',
+		shadowOpacity: 0.15,
+		shadowRadius: 10,
+		shadowOffset: { width: 0, height: 4 },
+		elevation: 3,
+	},
+	pickerTitle: {
+		fontSize: 16,
+		fontWeight: '700',
+		paddingVertical: 8,
+		paddingHorizontal: 8,
+	},
+	pickerItem: {
+		paddingVertical: 10,
+		paddingHorizontal: 12,
+		borderRadius: 8,
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+	},
+	pickerItemText: { color: '#222', fontSize: 15 },
+	pickerItemTextActive: { color: '#0a84ff', fontWeight: '700' },
+	pickerCheck: { color: '#0a84ff', fontSize: 16, fontWeight: '700' },
 	empty: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 	emptyText: { color: '#666' },
 	row: {
