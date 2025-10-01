@@ -30,6 +30,12 @@ jobs:
           corepack prepare yarn@4.10.2 --activate
           yarn -v
 
+      - name: Verify toolchain
+        run: |
+          node -v
+          which yarn
+          yarn -v
+
       - name: Install dependencies
         run: yarn install --immutable
 
