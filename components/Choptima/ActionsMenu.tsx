@@ -19,7 +19,7 @@ import useChoptimaStore from './useChoptimaStore'
 type Props = {
 	checklistMode: boolean
 	onToggleChecklist: () => void
-	expandAll: boolean
+	hasAllStepsExpanded: boolean
 	onToggleExpandAll: () => void
 	// removed unused setters; use onToggleChecklist/onToggleExpandAll callbacks
 	onTogglePin?: (actionId: string) => void
@@ -29,7 +29,7 @@ const ActionsMenu: React.FC<Props> = memo(
 	({
 		checklistMode,
 		onToggleChecklist,
-		expandAll,
+		hasAllStepsExpanded,
 		onToggleExpandAll,
 		onTogglePin,
 	}) => {
@@ -147,7 +147,7 @@ const ActionsMenu: React.FC<Props> = memo(
 												}}
 											>
 												<Text style={styles.itemText}>
-													{expandAll ? 'Collapse all' : 'Expand all'}
+													{hasAllStepsExpanded ? 'Collapse all' : 'Expand all'}
 												</Text>
 											</TouchableOpacity>
 											<TouchableOpacity
@@ -251,7 +251,7 @@ const ActionsMenu: React.FC<Props> = memo(
 						)}
 						{pinnedActions?.includes('toggle_expand') && (
 							<IconBtn
-								name="chevron.down"
+								name="chevron.left.forwardslash.chevron.right"
 								onPress={onToggleExpandAll}
 								onLongPress={() => Alert.alert('Toggle expand/collapse')}
 								accessibilityLabel="Toggle expand/collapse"
@@ -339,10 +339,12 @@ const ActionsMenu: React.FC<Props> = memo(
 ActionsMenu.displayName = 'ActionsMenu'
 
 const styles = StyleSheet.create({
-	pinnedScroll: { flex: 1, minWidth: '100%' },
+	pinnedScroll: { width: '100%' },
 	pinnedRow: {
+		paddingHorizontal: 8,
+		flex: 1,
+		flexGrow: 1,
 		alignItems: 'center',
-		width: '100%',
 	},
 	menuContent: { width: 260 },
 	actionsSeparator: {

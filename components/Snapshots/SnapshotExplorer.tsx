@@ -74,43 +74,51 @@ const SnapshotExplorer: React.FC<{ visible: boolean; onClose: () => void }> = ({
 	}, [visible, refresh])
 
 	const handleLoad = (key: string) => {
-		Alert.alert(
-			'Load snapshot',
-			'Load this snapshot and replace the current checklist?',
-			[
-				{ text: 'Cancel', style: 'cancel' },
-				{
-					text: 'Load',
-					style: 'destructive',
-					onPress: () => {
-						loadSnapshotToStore(key)
-						onClose()
-					},
-				},
-			],
-		)
+		loadSnapshotToStore(key)
+		onClose()
+		// Alert.alert(
+		// 	'Load snapshot',
+		// 	'Load this snapshot and replace the current checklist?',
+		// 	[
+		// 		{ text: 'Cancel', style: 'cancel' },
+		// 		{
+		// 			text: 'Load',
+		// 			style: 'destructive',
+		// 			onPress: () => {
+		// 				loadSnapshotToStore(key)
+		// 				onClose()
+		// 			},
+		// 		},
+		// 	],
+		// )
 	}
 
 	const handleDelete = (key: string) => {
-		Alert.alert(
-			'Delete snapshot',
-			'Are you sure you want to delete this snapshot?',
-			[
-				{ text: 'Cancel', style: 'cancel' },
-				{
-					text: 'Delete',
-					style: 'destructive',
-					onPress: () => {
-						try {
-							ChecklistStorage.delete(key)
-						} catch (e) {
-							console.warn('SnapshotExplorer: failed to delete', e)
-						}
-						refresh()
-					},
-				},
-			],
-		)
+		try {
+			ChecklistStorage.delete(key)
+		} catch (e) {
+			console.warn('SnapshotExplorer: failed to delete', e)
+		}
+		refresh()
+		// Alert.alert(
+		// 	'Delete snapshot',
+		// 	'Are you sure you want to delete this snapshot?',
+		// 	[
+		// 		{ text: 'Cancel', style: 'cancel' },
+		// 		{
+		// 			text: 'Delete',
+		// 			style: 'destructive',
+		// 			onPress: () => {
+		// 				try {
+		// 					ChecklistStorage.delete(key)
+		// 				} catch (e) {
+		// 					console.warn('SnapshotExplorer: failed to delete', e)
+		// 				}
+		// 				refresh()
+		// 			},
+		// 		},
+		// 	],
+		// )
 	}
 
 	const beginRename = (item: SnapshotItem) => {

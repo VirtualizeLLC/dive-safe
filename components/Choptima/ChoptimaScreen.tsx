@@ -1,6 +1,7 @@
 import type React from 'react'
 import { memo, useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import useUIPreferencesStore from '@/components/ui/useUIPreferencesStore'
 import ActionsMenu from './ActionsMenu'
 import { AssemblyChecklistControlled } from './AssemblyChecklist'
 import ChoptimaAssembly from './ChoptimaAssembly'
@@ -12,8 +13,13 @@ export const ChoptimaScreen: React.FC = memo(() => {
 	const [activeTab, setActiveTab] = useState<
 		'assembly' | 'disassembly' | 'diagrams'
 	>('assembly')
+	// Keep checklistMode as local state (doesn't need global persistence)
 	const [checklistMode, setChecklistMode] = useState(false)
-	const [expandAll, setExpandAll] = useState(false)
+	// Use Choptima store for hasAllStepsExpanded since it's checklist-specific
+	const hasAllStepsExpanded = useChoptimaStore((s) => s.hasAllStepsExpanded)
+	const setHasAllStepsExpanded = useChoptimaStore(
+		(s) => s.setHasAllStepsExpanded,
+	)
 	// pinned actions persisted in store
 	const pinnedActions = useChoptimaStore((s) => s.pinnedActions)
 	const togglePinnedAction = useChoptimaStore((s) => s.togglePinnedAction)
@@ -58,9 +64,11 @@ export const ChoptimaScreen: React.FC = memo(() => {
 							{/* Actions button on the far left (anchor provided by ActionsMenu) */}
 							<ActionsMenu
 								checklistMode={checklistMode}
-								onToggleChecklist={() => setChecklistMode((v) => !v)}
-								expandAll={expandAll}
-								onToggleExpandAll={() => setExpandAll((v) => !v)}
+								onToggleChecklist={() => setChecklistMode(!checklistMode)}
+								hasAllStepsExpanded={hasAllStepsExpanded}
+								onToggleExpandAll={() =>
+									setHasAllStepsExpanded(!hasAllStepsExpanded)
+								}
 								onTogglePin={(actionId: string) => togglePinnedAction(actionId)}
 							/>
 						</>
@@ -70,9 +78,12 @@ export const ChoptimaScreen: React.FC = memo(() => {
 				<View style={styles.content}>
 					{activeTab === 'assembly' &&
 						(checklistMode ? (
-							<AssemblyChecklistControlled expandAll={expandAll} />
+							<AssemblyChecklistControlled expandAll={hasAllStepsExpanded} />
 						) : (
-							<ChoptimaAssembly expandAll={expandAll} hideHeaderToggle />
+							<ChoptimaAssembly
+								hasAllStepsExpanded={hasAllStepsExpanded}
+								hideHeaderToggle
+							/>
 						))}
 					{activeTab === 'disassembly' && (
 						<View style={styles.placeholder}>

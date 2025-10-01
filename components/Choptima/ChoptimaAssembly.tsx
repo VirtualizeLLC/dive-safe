@@ -293,19 +293,19 @@ export const sampleSteps: AssemblyStep[] = [
 
 export const ChoptimaAssembly: React.FC<{
 	steps?: AssemblyStep[]
-	expandAll?: boolean
+	hasAllStepsExpanded?: boolean
 	onToggleExpandAll?: (v: boolean) => void
 	hideHeaderToggle?: boolean
 }> = ({
 	steps = sampleSteps,
-	expandAll,
+	hasAllStepsExpanded,
 	onToggleExpandAll,
 	hideHeaderToggle,
 }) => {
 	const [localExpandAll, setLocalExpandAll] = useState(false)
 
 	const actualExpandAll =
-		typeof expandAll === 'boolean' ? expandAll : localExpandAll
+		typeof hasAllStepsExpanded === 'boolean' ? hasAllStepsExpanded : localExpandAll
 
 	const handleToggle = () => {
 		const next = !actualExpandAll

@@ -32,6 +32,9 @@ type ChoptimaState = {
 	// currently loaded snapshot name (safe name used in storage)
 	loadedSnapshotName?: string
 	setLoadedSnapshotName: (name?: string) => void
+	// Checklist UI state that should persist with snapshots
+	hasAllStepsExpanded: boolean
+	setHasAllStepsExpanded: (expand: boolean) => void
 }
 
 const STORAGE_PREFIX = 'checklist'
@@ -102,7 +105,7 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 	namespace: undefined,
 	pinnedActions: [],
 	loadedSnapshotName: undefined,
-
+	hasAllStepsExpanded: false,
 	setNamespace: (ns) => {
 		set({ namespace: ns })
 		// immediately try to load for this namespace
@@ -191,6 +194,10 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 		set({ loadedSnapshotName: name })
 	},
 
+	setHasAllStepsExpanded: (expand) => {
+		set({ hasAllStepsExpanded: expand })
+	},
+
 	loadNamespace: (ns) => {
 		// alias for setNamespace
 		get().setNamespace(ns)
@@ -202,6 +209,7 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 				...state.items,
 				[id]: { ...(state.items[id] || { checked: false }), ...patch },
 			}
+			console.log('called set item for ', { id, patch })
 			schedulePersist(state.namespace, next)
 			return { items: next }
 		})
@@ -255,7 +263,18 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 				? String(name).trim().replace(/\s+/g, '_')
 				: timestamp
 			const snapshotKey = `${STORAGE_PREFIX}:snapshot:${safeName}`
-			const data = JSON.stringify(get().items)
+			// Include checklist items and checklist-specific UI state
+			const state = get()
+			const snapshotData = {
+				items: state.items,
+				hasAllStepsExpanded: state.hasAllStepsExpanded,
+			}
+			const data = JSON.stringify(snapshotData)
+			console.log('Saving snapshot to key:', snapshotKey) // debug log
+			console.log(
+				'Saving snapshot data:',
+				JSON.stringify(snapshotData, null, 2),
+			) // debug log
 			ChecklistStorage.set(snapshotKey, data)
 			// record the loaded snapshot name when saving
 			set({ loadedSnapshotName: safeName })
@@ -292,7 +311,22 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 			const raw = ChecklistStorage.getString(key)
 			if (!raw) return
 			const parsed = JSON.parse(raw)
-			set({ items: parsed })
+
+			// Handle both old format (items only) and new format (with checklist state)
+			if (parsed && typeof parsed === 'object') {
+				if (parsed.items) {
+					// New format with checklist state
+					set({
+						items: parsed.items || {},
+						hasAllStepsExpanded:
+							parsed.hasAllStepsExpanded || parsed.expandAll || false,
+					})
+				} else {
+					// Old format (items only)
+					set({ items: parsed })
+				}
+			}
+
 			// try to extract a human key portion from the storage key
 			try {
 				const marker = `${STORAGE_PREFIX}:snapshot:`
