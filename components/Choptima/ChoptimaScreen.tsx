@@ -1,18 +1,19 @@
 import type React from 'react'
 import { memo, useEffect, useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import useUIPreferencesStore from '@/components/ui/useUIPreferencesStore'
 import ActionsMenu from './ActionsMenu'
 import { AssemblyChecklistControlled } from './AssemblyChecklist'
 import ChoptimaAssembly from './ChoptimaAssembly'
 import DiagramsPlaceholder from './DiagramsPlaceholder'
 import LinksTab from './LinksTab'
+import ManualsTab from './ManualsTab'
 import TabButton from './TabButton'
 import useChoptimaStore from './useChoptimaStore'
 
 export const ChoptimaScreen: React.FC = memo(() => {
 	const [activeTab, setActiveTab] = useState<
-		'assembly' | 'disassembly' | 'diagrams' | 'links'
+		'assembly' | 'disassembly' | 'diagrams' | 'links' | 'manuals'
 	>('assembly')
 	// Keep checklistMode as local state (doesn't need global persistence)
 	const [checklistMode, setChecklistMode] = useState(false)
@@ -35,7 +36,7 @@ export const ChoptimaScreen: React.FC = memo(() => {
 	return (
 		<>
 			<View style={styles.container}>
-				<View style={styles.tabsRow}>
+				<ScrollView horizontal style={styles.tabsRow}>
 					<TabButton
 						label="Assembly"
 						active={activeTab === 'assembly'}
@@ -56,7 +57,12 @@ export const ChoptimaScreen: React.FC = memo(() => {
 						active={activeTab === 'links'}
 						onPress={() => setActiveTab('links')}
 					/>
-				</View>
+					<TabButton
+						label="Manuals"
+						active={activeTab === 'manuals'}
+						onPress={() => setActiveTab('manuals')}
+					/>
+				</ScrollView>
 
 				{/* Compact Actions button that opens the actions menu */}
 				<View style={styles.tabControlsRow}>
@@ -88,6 +94,7 @@ export const ChoptimaScreen: React.FC = memo(() => {
 					)}
 					{activeTab === 'diagrams' && <DiagramsPlaceholder />}
 					{activeTab === 'links' && <LinksTab />}
+					{activeTab === 'manuals' && <ManualsTab />}
 				</View>
 			</View>
 			{/* ActionsMenu anchor is rendered in the controls row above */}
@@ -99,7 +106,11 @@ ChoptimaScreen.displayName = 'ChoptimaScreen'
 
 const styles = StyleSheet.create({
 	container: { flex: 1 },
-	tabsRow: { flexDirection: 'row', padding: 8, backgroundColor: '#fff' },
+	tabsRow: {
+		flexGrow: 0,
+		padding: 8,
+		backgroundColor: '#fff',
+	},
 	tab: {
 		paddingVertical: 8,
 		paddingHorizontal: 12,
