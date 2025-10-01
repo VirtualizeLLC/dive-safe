@@ -18,6 +18,7 @@ type SnapshotItem = {
 	key: string
 	name: string
 	createdAt?: number
+	updatedAt?: number
 }
 
 const humanizeTime = (ms?: number) => {
@@ -42,6 +43,12 @@ const SnapshotExplorer: React.FC<{ visible: boolean; onClose: () => void }> = ({
 	const [editingName, setEditingName] = useState<string>('')
 	const loadSnapshotToStore = useChoptimaStore((s) => s.loadSnapshot)
 
+	// sorting controls
+	type SortBy = 'name' | 'createdAt' | 'updatedAt'
+	type SortDir = 'asc' | 'desc'
+	const [sortBy, setSortBy] = useState<SortBy>('createdAt')
+	const [sortDir, setSortDir] = useState<SortDir>('desc')
+
 	const refresh = React.useCallback(() => {
 		try {
 			const keys: string[] =
@@ -52,22 +59,45 @@ const SnapshotExplorer: React.FC<{ visible: boolean; onClose: () => void }> = ({
 			const mapped: SnapshotItem[] = snapshotKeys.map((k) => {
 				const name = k.replace(SNAPSHOT_PREFIX, '')
 				let createdAt: number | undefined
-				// try to parse ISO timestamp suffix
-				if (name?.startsWith('202')) {
-					// name probably is an ISO timestamp variant
+				let updatedAt: number | undefined
+				// prefer reading from stored payload (createdAt/updatedAt)
+				try {
+					const raw = ChecklistStorage.getString(k)
+					if (raw) {
+						const json = JSON.parse(raw)
+						if (json?.createdAt) {
+							const t = Date.parse(json.createdAt)
+							if (!Number.isNaN(t)) createdAt = t
+						}
+						if (json?.updatedAt) {
+							const t = Date.parse(json.updatedAt)
+							if (!Number.isNaN(t)) updatedAt = t
+						}
+					}
+				} catch {}
+				// legacy fallback: infer from name if it looks like a timestamp
+				if (!createdAt && name?.startsWith('202')) {
 					const date = new Date(name)
 					if (!Number.isNaN(date.getTime())) createdAt = date.getTime()
 				}
-				return { key: k, name, createdAt }
+				return { key: k, name, createdAt, updatedAt }
 			})
-			// sort newest first by createdAt or name fallback
-			mapped.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+			// sort using controls
+			mapped.sort((a, b) => {
+				const dir = sortDir === 'asc' ? 1 : -1
+				if (sortBy === 'name') {
+					return dir * a.name.localeCompare(b.name)
+				}
+				const va = (a[sortBy] as number | undefined) ?? 0
+				const vb = (b[sortBy] as number | undefined) ?? 0
+				return dir * (va - vb)
+			})
 			setItems(mapped)
 		} catch (e) {
 			console.warn('SnapshotExplorer: failed to load snapshots', e)
 			setItems([])
 		}
-	}, [])
+	}, [sortBy, sortDir])
 
 	useEffect(() => {
 		if (visible) refresh()
@@ -220,6 +250,49 @@ const SnapshotExplorer: React.FC<{ visible: boolean; onClose: () => void }> = ({
 					</TouchableOpacity>
 				</View>
 
+				{/* sorting UI */}
+				<View style={styles.sortRow}>
+					<Text style={styles.sortLabel}>Sort by:</Text>
+					<TouchableOpacity onPress={() => setSortBy('name')}>
+						<Text
+							style={[
+								styles.sortOption,
+								sortBy === 'name' && styles.sortActive,
+							]}
+						>
+							Name
+						</Text>
+					</TouchableOpacity>
+					<TouchableOpacity onPress={() => setSortBy('createdAt')}>
+						<Text
+							style={[
+								styles.sortOption,
+								sortBy === 'createdAt' && styles.sortActive,
+							]}
+						>
+							Created
+						</Text>
+					</TouchableOpacity>
+					<TouchableOpacity onPress={() => setSortBy('updatedAt')}>
+						<Text
+							style={[
+								styles.sortOption,
+								sortBy === 'updatedAt' && styles.sortActive,
+							]}
+						>
+							Updated
+						</Text>
+					</TouchableOpacity>
+					<View style={{ flex: 1 }} />
+					<TouchableOpacity
+						onPress={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
+					>
+						<Text style={styles.sortDir}>
+							{sortDir === 'asc' ? 'ASC ↑' : 'DESC ↓'}
+						</Text>
+					</TouchableOpacity>
+				</View>
+
 				{items.length === 0 ? (
 					<View style={styles.empty}>
 						<Text style={styles.emptyText}>
@@ -251,6 +324,17 @@ const styles = StyleSheet.create({
 	},
 	headerTitle: { fontSize: 20, fontWeight: '700' },
 	close: { color: '#0a84ff', fontWeight: '600' },
+	sortRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		paddingHorizontal: 16,
+		paddingVertical: 8,
+		gap: 12,
+	},
+	sortLabel: { fontWeight: '700', marginRight: 8 },
+	sortOption: { marginRight: 12, color: '#333' },
+	sortActive: { textDecorationLine: 'underline' },
+	sortDir: { fontWeight: '600', color: '#0a84ff' },
 	empty: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 	emptyText: { color: '#666' },
 	row: {

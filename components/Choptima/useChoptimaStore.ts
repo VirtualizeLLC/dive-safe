@@ -258,16 +258,29 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 	saveSnapshot: (name) => {
 		// Always write snapshots under the canonical prefix so explorers and lists can find them.
 		try {
-			const timestamp = new Date().toISOString()
+			const now = new Date().toISOString()
+			const timestamp = now
 			const safeName = name
 				? String(name).trim().replace(/\s+/g, '_')
 				: timestamp
 			const snapshotKey = `${STORAGE_PREFIX}:snapshot:${safeName}`
-			// Include checklist items and checklist-specific UI state
+			// Include checklist items and checklist-specific UI state + metadata
 			const state = get()
+			let createdAt = now
+			// preserve createdAt if overwriting existing snapshot
+			try {
+				const existingRaw = ChecklistStorage.getString(snapshotKey)
+				if (existingRaw) {
+					const existing = JSON.parse(existingRaw)
+					if (existing?.createdAt) createdAt = String(existing.createdAt)
+				}
+			} catch {}
 			const snapshotData = {
 				items: state.items,
 				hasAllStepsExpanded: state.hasAllStepsExpanded,
+				createdAt,
+				updatedAt: now,
+				version: 1,
 			}
 			const data = JSON.stringify(snapshotData)
 			console.log('Saving snapshot to key:', snapshotKey) // debug log
