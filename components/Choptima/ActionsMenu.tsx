@@ -62,10 +62,10 @@ const ActionsMenu: React.FC<Props> = memo(
 			if (hasUnsavedChanges()) {
 				Alert.alert(
 					'Unsaved changes',
-					'Starting a new sheet will discard unsaved changes. Continue?',
+					'Starting a new checklist will discard unsaved changes. Continue?',
 					[
 						{ text: 'Cancel', style: 'cancel' },
-						{ text: 'Start new', style: 'destructive', onPress: proceed },
+						{ text: 'Start new checklist', style: 'destructive', onPress: proceed },
 					],
 				)
 			} else {
@@ -123,13 +123,18 @@ const ActionsMenu: React.FC<Props> = memo(
 									}
 								>
 									<View style={styles.menuContent}>
-										{/* New sheet */}
+										{/* New checklist */}
 										<View style={styles.itemRow}>
 											<TouchableOpacity
 												style={styles.itemAction}
 												onPress={confirmAndNewSheet}
 											>
-												<Text style={styles.itemText}>New sheet</Text>
+												<View style={styles.itemActionContent}>
+													<IconSymbol name={'plus'} size={18} color={'#222'} />
+													<Text style={[styles.itemText, styles.itemActionText]}>
+														New checklist
+													</Text>
+												</View>
 											</TouchableOpacity>
 											<TouchableOpacity
 												style={styles.pin}
@@ -137,13 +142,15 @@ const ActionsMenu: React.FC<Props> = memo(
 													e.stopPropagation()
 													onTogglePin?.('new_sheet')
 												}}
-												accessibilityLabel="Pin new sheet"
+												accessibilityLabel="Pin new checklist"
 											>
 												<IconSymbol
 													name={'pin'}
 													size={18}
 													color={
-														pinnedActions?.includes('new_sheet') ? '#ff9800' : '#888'
+														pinnedActions?.includes('new_sheet')
+															? '#ff9800'
+															: '#888'
 													}
 												/>
 											</TouchableOpacity>
@@ -157,11 +164,20 @@ const ActionsMenu: React.FC<Props> = memo(
 													setVisible(false)
 												}}
 											>
-												<Text style={styles.itemText}>
-													{checklistMode
-														? 'Turn checklist OFF'
-														: 'Turn checklist ON'}
-												</Text>
+												<View style={styles.itemActionContent}>
+													<IconSymbol
+														name={'checkmark.square.fill'}
+														size={18}
+														color={'#222'}
+													/>
+													<Text
+														style={[styles.itemText, styles.itemActionText]}
+													>
+														{checklistMode
+															? 'Turn checklist OFF'
+															: 'Turn checklist ON'}
+													</Text>
+												</View>
 											</TouchableOpacity>
 											<TouchableOpacity
 												style={styles.pin}
@@ -191,9 +207,20 @@ const ActionsMenu: React.FC<Props> = memo(
 													setVisible(false)
 												}}
 											>
-												<Text style={styles.itemText}>
-													{hasAllStepsExpanded ? 'Collapse all' : 'Expand all'}
-												</Text>
+												<View style={styles.itemActionContent}>
+													<IconSymbol
+														name={'chevron.left.forwardslash.chevron.right'}
+														size={18}
+														color={'#222'}
+													/>
+													<Text
+														style={[styles.itemText, styles.itemActionText]}
+													>
+														{hasAllStepsExpanded
+															? 'Collapse all'
+															: 'Expand all'}
+													</Text>
+												</View>
 											</TouchableOpacity>
 											<TouchableOpacity
 												style={styles.pin}
@@ -223,7 +250,18 @@ const ActionsMenu: React.FC<Props> = memo(
 													setVisible(false)
 												}}
 											>
-												<Text style={styles.itemText}>Save snapshot</Text>
+												<View style={styles.itemActionContent}>
+													<IconSymbol
+														name={'square.and.arrow.down'}
+														size={18}
+														color={'#222'}
+													/>
+													<Text
+														style={[styles.itemText, styles.itemActionText]}
+													>
+														Save snapshot
+													</Text>
+												</View>
 											</TouchableOpacity>
 											<TouchableOpacity
 												style={styles.pin}
@@ -251,7 +289,14 @@ const ActionsMenu: React.FC<Props> = memo(
 													setVisible(false)
 												}}
 											>
-												<Text style={styles.itemText}>Browse snapshots</Text>
+												<View style={styles.itemActionContent}>
+													<IconSymbol name={'clock'} size={18} color={'#222'} />
+													<Text
+														style={[styles.itemText, styles.itemActionText]}
+													>
+														Browse snapshots
+													</Text>
+												</View>
 											</TouchableOpacity>
 											<TouchableOpacity
 												style={styles.pin}
@@ -290,8 +335,8 @@ const ActionsMenu: React.FC<Props> = memo(
 							<IconBtn
 								name="plus"
 								onPress={confirmAndNewSheet}
-								onLongPress={() => Alert.alert('New sheet')}
-								accessibilityLabel="New sheet"
+								onLongPress={() => Alert.alert('New checklist')}
+								accessibilityLabel="New checklist"
 							/>
 						)}
 						{pinnedActions?.includes('toggle_checklist') && (
@@ -329,13 +374,13 @@ const ActionsMenu: React.FC<Props> = memo(
 					</ScrollView>
 				</View>
 
-				{/* lower panel showing current sheet name and rename control */}
+				{/* lower panel showing current checklist name and rename control */}
 				<View style={styles.lowerPanel}>
 					{editing ? (
 						<>
 							<TextInput
 								onChangeText={setNameInput}
-								placeholder="Sheet name"
+								placeholder="Checklist name"
 								defaultValue={saveName}
 								style={styles.nameInput}
 							/>
@@ -363,7 +408,7 @@ const ActionsMenu: React.FC<Props> = memo(
 						</>
 					) : (
 						<>
-							<Text style={styles.sheetLabel}>Sheet: {saveName}</Text>
+							<Text style={styles.sheetLabel}>Checklist: {saveName}</Text>
 							<IconButton
 								onPress={() => {
 									setNameInput(
@@ -415,6 +460,8 @@ const styles = StyleSheet.create({
 		borderBottomColor: '#f2f2f2',
 	},
 	itemAction: { flex: 1 },
+	itemActionContent: { flexDirection: 'row', alignItems: 'center' },
+	itemActionText: { marginLeft: 8 },
 	itemText: { fontSize: 15, color: '#222' },
 	actionsBtn: {
 		paddingVertical: 6,

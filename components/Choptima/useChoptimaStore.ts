@@ -272,7 +272,7 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 			get().clear()
 			const safeName = name
 				? String(name).trim().replace(/\s+/g, '_')
-			: undefined
+				: undefined
 			set({
 				loadedSnapshotName: safeName,
 				hasAllStepsExpanded: false,
@@ -399,9 +399,14 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 	},
 
 	// compare current items to snapshot baseline to detect unsaved changes
-		hasUnsavedChanges: () => {
+	hasUnsavedChanges: () => {
 		try {
-			const { items, snapshotBaseline, hasAllStepsExpanded, snapshotBaselineExpand } = get()
+			const {
+				items,
+				snapshotBaseline,
+				hasAllStepsExpanded,
+				snapshotBaselineExpand,
+			} = get()
 			// if baseline not set, consider dirty when there is any content
 			if (!snapshotBaseline) {
 				return (
@@ -426,7 +431,9 @@ export const useChoptimaStore = create<ChoptimaState>((set, get) => ({
 				if (avStr !== bvStr) return true
 			}
 			// finally compare expand baseline
-			if ((snapshotBaselineExpand || false) !== (hasAllStepsExpanded || false)) {
+			if (
+				(snapshotBaselineExpand || false) !== (hasAllStepsExpanded || false)
+			) {
 				return true
 			}
 			return false
