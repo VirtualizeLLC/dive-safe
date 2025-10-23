@@ -31,7 +31,7 @@ function HomeScreen() {
     >
       <View style={styles.storybookButtons}>
         <Button
-          title="Open Choptima"
+          title='Open Choptima'
           onPress={() => {
             navigation.navigate('Choptima')
           }}
@@ -59,13 +59,13 @@ export default function FullAppEntry() {
                     paddingLeft: 8,
                   }}
                 >
-                  <MaterialIcons name="info-outline" size={26} color={'#000'} />
+                  <MaterialIcons name='info-outline' size={26} color={'#000'} />
                 </View>
               )
             },
             tabBarIcon: ({ color, size }) => (
               <MaterialIcons
-                name="info-outline"
+                name='info-outline'
                 size={size ?? 26}
                 color={color}
               />
@@ -88,7 +88,7 @@ export default function FullAppEntry() {
                   <Image
                     source={require('@/assets/images/choptima-image.png')}
                     style={{ width: 48, height: 48 }}
-                    contentFit="contain"
+                    contentFit='contain'
                   />
                 </View>
               )
@@ -97,7 +97,7 @@ export default function FullAppEntry() {
               <Image
                 source={require('@/assets/images/choptima-image.png')}
                 style={{ width: size ?? 26, height: size ?? 26 }}
-                contentFit="contain"
+                contentFit='contain'
               />
             ),
           }}

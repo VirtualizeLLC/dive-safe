@@ -93,7 +93,7 @@ const PdfModal: React.FC<Props> = ({
   const resetScale = () => setScale(1)
 
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
+    <Modal visible={visible} animationType='slide' onRequestClose={onClose}>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title} numberOfLines={1}>
@@ -153,9 +153,9 @@ const PdfModal: React.FC<Props> = ({
                       maximumValue={Math.max(1, totalPages)}
                       value={page}
                       step={1}
-                      minimumTrackTintColor="#0a84ff"
-                      maximumTrackTintColor="#555"
-                      thumbTintColor="#0a84ff"
+                      minimumTrackTintColor='#0a84ff'
+                      maximumTrackTintColor='#555'
+                      thumbTintColor='#0a84ff'
                       onValueChange={(v) => goToPage(v)}
                     />
                     <TouchableOpacity
@@ -170,11 +170,11 @@ const PdfModal: React.FC<Props> = ({
                       <Text style={styles.gotoLabel}>Go to</Text>
                       <TextInput
                         style={styles.gotoInput}
-                        keyboardType="number-pad"
+                        keyboardType='number-pad'
                         value={gotoInput}
                         onChangeText={setGotoInput}
                         placeholder={`${page}`}
-                        placeholderTextColor="#aaa"
+                        placeholderTextColor='#aaa'
                         onSubmitEditing={() => {
                           const num = Number(gotoInput)
                           if (!Number.isNaN(num)) goToPage(num)

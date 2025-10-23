@@ -38,23 +38,23 @@ const Entry = () => {
     <>
       {/* Collapsible header */}
       {demoHeaderCollapsed ? (
-        <View style={styles.collapsedContainer} pointerEvents="box-none">
+        <View style={styles.collapsedContainer} pointerEvents='box-none'>
           <TouchableOpacity
             style={styles.chevronButton}
             onPress={() => setDemoHeaderCollapsed(false)}
-            accessibilityLabel="Expand header"
+            accessibilityLabel='Expand header'
           >
             <Text style={styles.chevron}>UX</Text>
           </TouchableOpacity>
         </View>
       ) : (
-        <View style={styles.headerContainer} pointerEvents="box-none">
+        <View style={styles.headerContainer} pointerEvents='box-none'>
           <View style={styles.headerRow}>
             <Text style={styles.headerTitle}>Demo Controls</Text>
             <TouchableOpacity
               style={styles.collapseButton}
               onPress={() => setDemoHeaderCollapsed(true)}
-              accessibilityLabel="Collapse header"
+              accessibilityLabel='Collapse header'
             >
               <Text style={styles.collapseText}>Close</Text>
             </TouchableOpacity>
@@ -63,7 +63,7 @@ const Entry = () => {
             <TouchableOpacity
               style={styles.primaryButton}
               onPress={() => setShowStorybook(false)}
-              accessibilityLabel="Show App"
+              accessibilityLabel='Show App'
             >
               <Text style={styles.primaryText}>Show App</Text>
             </TouchableOpacity>
@@ -71,7 +71,7 @@ const Entry = () => {
             <TouchableOpacity
               style={styles.secondaryButton}
               onPress={() => setShowStorybook(true)}
-              accessibilityLabel="Show Demo"
+              accessibilityLabel='Show Demo'
             >
               <Text style={styles.secondaryText}>Show Demo</Text>
             </TouchableOpacity>

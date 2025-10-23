@@ -33,12 +33,12 @@ export default function HomeScreen() {
     >
       <View style={styles.storybookButtons}>
         <Button
-          title="Open Demo (Screens)"
+          title='Open Demo (Screens)'
           onPress={() => setShowStorybook(true)}
         />
       </View>
       <View style={styles.storybookButtons}>
-        <Button title="Open Full App" onPress={() => setShowStorybook(true)} />
+        <Button title='Open Full App' onPress={() => setShowStorybook(true)} />
       </View>
     </ParallaxScrollView>
   )

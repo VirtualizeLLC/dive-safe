@@ -195,7 +195,7 @@ const SnapshotExplorer: React.FC<{ visible: boolean; onClose: () => void }> = ({
             value={editingName}
             onChangeText={setEditingName}
             style={styles.input}
-            placeholder="Snapshot name"
+            placeholder='Snapshot name'
             autoFocus
           />
         ) : (
@@ -248,7 +248,7 @@ const SnapshotExplorer: React.FC<{ visible: boolean; onClose: () => void }> = ({
   )
 
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
+    <Modal visible={visible} animationType='slide' onRequestClose={onClose}>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Snapshots</Text>
@@ -264,7 +264,7 @@ const SnapshotExplorer: React.FC<{ visible: boolean; onClose: () => void }> = ({
             <TouchableOpacity
               onPress={() => setSortPickerVisible(true)}
               style={[styles.sortChip, styles.sortSelectBtn]}
-              accessibilityLabel="Select sort field"
+              accessibilityLabel='Select sort field'
             >
               <Text style={styles.sortChipText}>{sortLabelMap[sortBy]}</Text>
             </TouchableOpacity>
@@ -283,7 +283,7 @@ const SnapshotExplorer: React.FC<{ visible: boolean; onClose: () => void }> = ({
         <Modal
           visible={sortPickerVisible}
           transparent
-          animationType="fade"
+          animationType='fade'
           onRequestClose={() => setSortPickerVisible(false)}
         >
           <TouchableWithoutFeedback onPress={() => setSortPickerVisible(false)}>

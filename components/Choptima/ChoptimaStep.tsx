@@ -69,7 +69,7 @@ const Collapsible: React.FC<{
       <Animated.View style={animatedStyle}>{children}</Animated.View>
       <View
         style={styles._measure}
-        pointerEvents="none"
+        pointerEvents='none'
         onLayout={(e) => {
           const h = Math.round(e.nativeEvent.layout.height)
           if (h > 0 && h !== measuredHeight) setMeasuredHeight(h)
@@ -113,7 +113,7 @@ function renderMarkdown(content?: string) {
           key={`${i}-${uri}`}
           source={{ uri }}
           style={styles.inlineImage}
-          resizeMode="contain"
+          resizeMode='contain'
         />
       )
     }
@@ -213,7 +213,7 @@ export const ChoptimaStep: React.FC<Props> = ({
                     if (onCheckedChange) onCheckedChange(next)
                     else setInternalChecked(next)
                   }}
-                  color="#0a84ff"
+                  color='#0a84ff'
                 />
               </View>
             ))}
@@ -238,7 +238,7 @@ export const ChoptimaStep: React.FC<Props> = ({
                 key={uri}
                 source={{ uri }}
                 style={styles.image}
-                resizeMode="contain"
+                resizeMode='contain'
               />
             ))}
 

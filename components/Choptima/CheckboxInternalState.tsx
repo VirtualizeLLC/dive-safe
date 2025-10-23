@@ -57,7 +57,7 @@ const CheckboxInternalState: FC<Props> = ({
       <PaperCheckbox
         status={checked ? 'checked' : 'unchecked'}
         onPress={handlePress}
-        color="#0a84ff"
+        color='#0a84ff'
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
     </View>
