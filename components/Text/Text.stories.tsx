@@ -11,15 +11,15 @@ const meta = {
 export default meta
 
 type Story = {
-  args?: any
-  render?: (args?: any) => React.ReactNode
+  args?: Record<string, unknown>
+  render?: (args: Record<string, unknown>) => React.ReactNode
 }
 
 export const Default: Story = {
   args: {
     children: 'Hello Storybook',
   },
-  render: (args: any) => (
+  render: (args: Record<string, unknown>) => (
     <View style={{ padding: 16 }}>
       <Text {...args} />
     </View>

@@ -43,6 +43,7 @@ config.resolver.sourceExts = [
 
 try {
   // prefer withStorybookConfig/withStorybook if available
+  // biome-ignore lint/correctness/noUnusedVariables: does not matter here
   const { withStorybook, withStorybookConfig } =
     require('@storybook/react-native/metro/withStorybook') || {}
   // Some versions export the helpers directly from paths
