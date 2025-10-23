@@ -21,42 +21,42 @@ export const IconButton: React.FC<{
   label,
   showLabelOnLongPress = true,
 }) => {
-  const [showLabel, setShowLabel] = useState(false)
+    const [showLabel, setShowLabel] = useState(false)
 
-  const handleLongPress = useCallback(() => {
-    if (showLabelOnLongPress && label) {
-      setShowLabel(true)
-    }
-    // preserve existing behavior for consumers that still pass a handler
-    onLongPress?.()
-  }, [label, onLongPress, showLabelOnLongPress])
+    const handleLongPress = useCallback(() => {
+      if (showLabelOnLongPress && label) {
+        setShowLabel(true)
+      }
+      // preserve existing behavior for consumers that still pass a handler
+      onLongPress?.()
+    }, [label, onLongPress, showLabelOnLongPress])
 
-  const handlePressOut = useCallback(() => {
-    if (showLabel) setShowLabel(false)
-  }, [showLabel])
+    const handlePressOut = useCallback(() => {
+      if (showLabel) setShowLabel(false)
+    }, [showLabel])
 
-  return (
-    <View style={styles.wrapper}>
-      {showLabel && label ? (
-        <View style={styles.tooltip} pointerEvents="none">
-          <Text style={styles.tooltipText} numberOfLines={1}>
-            {label}
-          </Text>
-        </View>
-      ) : null}
-      <TouchableOpacity
-        style={styles.btn}
-        onPress={onPress}
-        onLongPress={handleLongPress}
-        onPressOut={handlePressOut}
-        accessibilityLabel={accessibilityLabel}
-        delayLongPress={400}
-      >
-        <IconSymbol name={name} size={size} color={color} />
-      </TouchableOpacity>
-    </View>
-  )
-}
+    return (
+      <View style={styles.wrapper}>
+        {showLabel && label ? (
+          <View style={styles.tooltip} pointerEvents="none">
+            <Text style={styles.tooltipText} numberOfLines={1}>
+              {label}
+            </Text>
+          </View>
+        ) : null}
+        <TouchableOpacity
+          style={styles.btn}
+          onPress={onPress}
+          onLongPress={handleLongPress}
+          onPressOut={handlePressOut}
+          accessibilityLabel={accessibilityLabel}
+          delayLongPress={400}
+        >
+          <IconSymbol name={name} size={size} color={color} />
+        </TouchableOpacity>
+      </View>
+    )
+  }
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f2f2f2',
+    backgroundColor: '#fff',
   },
   tooltip: {
     position: 'absolute',

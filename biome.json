@@ -6,7 +6,8 @@
     "useIgnoreFile": true
   },
   "files": {
-    "ignoreUnknown": false
+    "ignoreUnknown": false,
+    "includes": ["**/*.{js,jsx,ts,tsx}"]
   },
   "formatter": {
     "enabled": true,
@@ -23,9 +24,11 @@
     }
   },
   "javascript": {
+    "jsxRuntime": "transparent",
     "formatter": {
       "quoteStyle": "single",
-      "semicolons": "asNeeded"
+      "semicolons": "asNeeded",
+      "jsxQuoteStyle": "single"
     }
   },
   "assist": {
