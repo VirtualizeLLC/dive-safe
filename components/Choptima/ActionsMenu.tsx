@@ -115,165 +115,196 @@ const ActionsMenu: React.FC<Props> = memo(
                   onDismiss={() => {
                     setVisible(false)
                   }}
-                  mode="elevated"
+                  style={{}}
+                  contentStyle={styles.menuContent}
+                  mode='elevated'
                   anchor={
                     <View
                       style={[styles.actionsBtn, { height: 0, width: 0 }]}
                     />
                   }
                 >
-                  <View style={styles.menuContent}>
-                    {/* New sheet */}
-                    <View style={styles.itemRow}>
-                      <TouchableOpacity
-                        style={styles.itemAction}
-                        onPress={confirmAndNewSheet}
-                      >
-                        <Text style={styles.itemText}>New sheet</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.pin}
-                        onPress={(e: GestureResponderEvent) => {
-                          e.stopPropagation()
-                          onTogglePin?.('new_sheet')
-                        }}
-                        accessibilityLabel="Pin new sheet"
-                      >
-                        <IconSymbol
-                          name={'pin'}
-                          size={18}
-                          color={
-                            pinnedActions?.includes('new_sheet')
-                              ? '#ff9800'
-                              : '#888'
-                          }
-                        />
-                      </TouchableOpacity>
-                    </View>
+                  <View style={styles.itemRow}>
+                    <IconBtn
+                      name='plus'
+                      onPress={confirmAndNewSheet}
+                      label='New sheet'
+                      accessibilityLabel='New sheet'
+                    />
+                    <TouchableOpacity
+                      style={styles.itemAction}
+                      onPress={confirmAndNewSheet}
+                    >
+                      <Text style={styles.itemText}>New sheet</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.pin}
+                      onPress={(e: GestureResponderEvent) => {
+                        e.stopPropagation()
+                        onTogglePin?.('new_sheet')
+                      }}
+                      accessibilityLabel='Pin new sheet'
+                    >
+                      <IconSymbol
+                        name={'pin'}
+                        size={18}
+                        color={
+                          pinnedActions?.includes('new_sheet')
+                            ? '#ff9800'
+                            : '#888'
+                        }
+                      />
+                    </TouchableOpacity>
+                  </View>
 
-                    <View style={styles.itemRow}>
-                      <TouchableOpacity
-                        style={styles.itemAction}
-                        onPress={() => {
-                          onToggleChecklist()
-                          setVisible(false)
-                        }}
-                      >
-                        <Text style={styles.itemText}>
-                          {hasCheckListMode
-                            ? 'Turn checklist OFF'
-                            : 'Turn checklist ON'}
-                        </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.pin}
-                        onPress={(e: GestureResponderEvent) => {
-                          e.stopPropagation()
-                          onTogglePin?.('toggle_checklist')
-                        }}
-                        accessibilityLabel="Pin toggle checklist"
-                      >
-                        <IconSymbol
-                          name={'pin'}
-                          size={18}
-                          color={
-                            pinnedActions?.includes('toggle_checklist')
-                              ? '#ff9800'
-                              : '#888'
-                          }
-                        />
-                      </TouchableOpacity>
-                    </View>
+                  <View style={styles.itemRow}>
+                    <IconBtn
+                      name='checkmark.square.fill'
+                      onPress={onToggleChecklist}
+                      label='Toggle checklist'
+                      accessibilityLabel='Toggle checklist'
+                    />
+                    <TouchableOpacity
+                      style={styles.itemAction}
+                      onPress={() => {
+                        onToggleChecklist()
+                        setVisible(false)
+                      }}
+                    >
+                      <Text style={styles.itemText}>
+                        {hasCheckListMode
+                          ? 'Turn checklist OFF'
+                          : 'Turn checklist ON'}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.pin}
+                      onPress={(e: GestureResponderEvent) => {
+                        e.stopPropagation()
+                        onTogglePin?.('toggle_checklist')
+                      }}
+                      accessibilityLabel='Pin toggle checklist'
+                    >
+                      <IconSymbol
+                        name={'pin'}
+                        size={18}
+                        color={
+                          pinnedActions?.includes('toggle_checklist')
+                            ? '#ff9800'
+                            : '#888'
+                        }
+                      />
+                    </TouchableOpacity>
+                  </View>
 
-                    <View style={styles.itemRow}>
-                      <TouchableOpacity
-                        style={styles.itemAction}
-                        onPress={() => {
-                          setHasAllStepsExpanded(!hasAllStepsExpanded)
-                          setVisible(false)
-                        }}
-                      >
-                        <Text style={styles.itemText}>
-                          {hasAllStepsExpanded ? 'Collapse all' : 'Expand all'}
-                        </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.pin}
-                        onPress={(e: GestureResponderEvent) => {
-                          e.stopPropagation()
-                          onTogglePin?.('toggle_expand')
-                        }}
-                        accessibilityLabel="Pin expand all"
-                      >
-                        <IconSymbol
-                          name={'pin'}
-                          size={18}
-                          color={
-                            pinnedActions?.includes('toggle_expand')
-                              ? '#ff9800'
-                              : '#888'
-                          }
-                        />
-                      </TouchableOpacity>
-                    </View>
+                  <View style={styles.itemRow}>
+                    <IconBtn
+                      name='chevron.left.forwardslash.chevron.right'
+                      onPress={() =>
+                        setHasAllStepsExpanded(!hasAllStepsExpanded)
+                      }
+                      label='Toggle expand/collapse'
+                      accessibilityLabel='Toggle expand/collapse'
+                    />
+                    <TouchableOpacity
+                      style={styles.itemAction}
+                      onPress={() => {
+                        setHasAllStepsExpanded(!hasAllStepsExpanded)
+                        setVisible(false)
+                      }}
+                    >
+                      <Text style={styles.itemText}>
+                        {hasAllStepsExpanded ? 'Collapse all' : 'Expand all'}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.pin}
+                      onPress={(e: GestureResponderEvent) => {
+                        e.stopPropagation()
+                        onTogglePin?.('toggle_expand')
+                      }}
+                      accessibilityLabel='Pin expand all'
+                    >
+                      <IconSymbol
+                        name={'pin'}
+                        size={18}
+                        color={
+                          pinnedActions?.includes('toggle_expand')
+                            ? '#ff9800'
+                            : '#888'
+                        }
+                      />
+                    </TouchableOpacity>
+                  </View>
 
-                    <View style={styles.itemRow}>
-                      <TouchableOpacity
-                        style={styles.itemAction}
-                        onPress={() => {
-                          handleSave()
-                          setVisible(false)
-                        }}
-                      >
-                        <Text style={styles.itemText}>Save snapshot</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.pin}
-                        onPress={(e: GestureResponderEvent) => {
-                          e.stopPropagation()
-                          onTogglePin?.('save')
-                        }}
-                        accessibilityLabel="Pin save"
-                      >
-                        <IconSymbol
-                          name={'pin'}
-                          size={18}
-                          color={
-                            pinnedActions?.includes('save') ? '#ff9800' : '#888'
-                          }
-                        />
-                      </TouchableOpacity>
-                    </View>
+                  <View style={styles.itemRow}>
+                    <IconBtn
+                      name='square.and.arrow.down'
+                      onPress={handleSave}
+                      label='Save snapshot'
+                      accessibilityLabel='Save snapshot'
+                    />
+                    <TouchableOpacity
+                      style={styles.itemAction}
+                      onPress={() => {
+                        handleSave()
+                        setVisible(false)
+                      }}
+                    >
+                      <Text style={styles.itemText}>Save snapshot</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.pin}
+                      onPress={(e: GestureResponderEvent) => {
+                        e.stopPropagation()
+                        onTogglePin?.('save')
+                      }}
+                      accessibilityLabel='Pin save'
+                    >
+                      <IconSymbol
+                        name={'pin'}
+                        size={18}
+                        color={
+                          pinnedActions?.includes('save') ? '#ff9800' : '#888'
+                        }
+                      />
+                    </TouchableOpacity>
+                  </View>
 
-                    <View style={styles.itemRow}>
-                      <TouchableOpacity
-                        style={styles.itemAction}
-                        onPress={() => {
-                          setShowSnapshots(true)
-                          setVisible(false)
-                        }}
-                      >
-                        <Text style={styles.itemText}>Browse snapshots</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.pin}
-                        onPress={(e: GestureResponderEvent) => {
-                          e.stopPropagation()
-                          onTogglePin?.('snapshots')
-                        }}
-                        accessibilityLabel="Pin snapshots"
-                      >
-                        <IconSymbol
-                          name={'pin'}
-                          size={18}
-                          color={
-                            pinnedActions?.includes('snapshots')
-                              ? '#ff9800'
-                              : '#888'
-                          }
-                        />
-                      </TouchableOpacity>
-                    </View>
+                  <View style={styles.itemRow}>
+                    <IconBtn
+                      name='clock'
+                      onPress={() => setShowSnapshots(true)}
+                      label='Open snapshots'
+                      accessibilityLabel='Open snapshots'
+                    />
+                    <TouchableOpacity
+                      style={styles.itemAction}
+                      onPress={() => {
+                        setShowSnapshots(true)
+                        setVisible(false)
+                      }}
+                    >
+                      <Text style={styles.itemText}>Browse snapshots</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.pin}
+                      onPress={(e: GestureResponderEvent) => {
+                        e.stopPropagation()
+                        onTogglePin?.('snapshots')
+                      }}
+                      accessibilityLabel='Pin snapshots'
+                    >
+                      <IconSymbol
+                        name={'pin'}
+                        size={18}
+                        color={
+                          pinnedActions?.includes('snapshots')
+                            ? '#ff9800'
+                            : '#888'
+                        }
+                      />
+                    </TouchableOpacity>
                   </View>
                 </Menu>
               )}
@@ -290,42 +321,42 @@ const ActionsMenu: React.FC<Props> = memo(
           >
             {pinnedActions?.includes('new_sheet') && (
               <IconBtn
-                name="plus"
+                name='plus'
                 onPress={confirmAndNewSheet}
-                label="New sheet"
-                accessibilityLabel="New sheet"
+                label='New sheet'
+                accessibilityLabel='New sheet'
               />
             )}
             {pinnedActions?.includes('toggle_checklist') && (
               <IconBtn
-                name="checkmark.square.fill"
+                name='checkmark.square.fill'
                 onPress={onToggleChecklist}
-                label="Toggle checklist"
-                accessibilityLabel="Toggle checklist"
+                label='Toggle checklist'
+                accessibilityLabel='Toggle checklist'
               />
             )}
             {pinnedActions?.includes('toggle_expand') && (
               <IconBtn
-                name="chevron.left.forwardslash.chevron.right"
+                name='chevron.left.forwardslash.chevron.right'
                 onPress={() => setHasAllStepsExpanded(!hasAllStepsExpanded)}
-                label="Toggle expand/collapse"
-                accessibilityLabel="Toggle expand/collapse"
+                label='Toggle expand/collapse'
+                accessibilityLabel='Toggle expand/collapse'
               />
             )}
             {pinnedActions?.includes('save') && (
               <IconBtn
-                name="square.and.arrow.down"
+                name='square.and.arrow.down'
                 onPress={handleSave}
-                label="Save snapshot"
-                accessibilityLabel="Save snapshot"
+                label='Save snapshot'
+                accessibilityLabel='Save snapshot'
               />
             )}
             {pinnedActions?.includes('snapshots') && (
               <IconBtn
-                name="clock"
+                name='clock'
                 onPress={() => setShowSnapshots(true)}
-                label="Open snapshots"
-                accessibilityLabel="Open snapshots"
+                label='Open snapshots'
+                accessibilityLabel='Open snapshots'
               />
             )}
           </ScrollView>
@@ -337,7 +368,7 @@ const ActionsMenu: React.FC<Props> = memo(
             <>
               <TextInput
                 onChangeText={setNameInput}
-                placeholder="Sheet name"
+                placeholder='Sheet name'
                 defaultValue={saveName}
                 style={styles.nameInput}
               />
@@ -376,7 +407,7 @@ const ActionsMenu: React.FC<Props> = memo(
                   setEditing(true)
                 }}
                 size={20}
-                icon="pencil"
+                icon='pencil'
                 style={styles.editIcon}
               />
             </>
@@ -401,7 +432,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: 'center',
   },
-  menuContent: { width: 260 },
+  menuContent: { width: 260, backgroundColor: '#fff' },
   actionsSeparator: {
     width: 1,
     height: 36,
@@ -422,7 +453,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 6,
-    backgroundColor: '#e6e6e6',
+    backgroundColor: '#fff',
   },
   actionsBtnText: { color: '#333', fontWeight: '600' },
   pin: { position: 'absolute', right: 8, top: 12, padding: 6 },
@@ -431,6 +462,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#fff',
     // gap not supported in RN; use spacing on children instead
   },
   nameInput: {

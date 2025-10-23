@@ -38,27 +38,27 @@ export const ChoptimaScreen: React.FC = memo(() => {
       <View style={styles.container}>
         <ScrollView horizontal style={styles.tabsRow}>
           <TabButton
-            label="Assembly"
+            label='Assembly'
             active={activeTab === 'assembly'}
             onPress={() => setActiveTab('assembly')}
           />
           <TabButton
-            label="Disassembly"
+            label='Disassembly'
             active={activeTab === 'disassembly'}
             onPress={() => setActiveTab('disassembly')}
           />
           <TabButton
-            label="Diagrams"
+            label='Diagrams'
             active={activeTab === 'diagrams'}
             onPress={() => setActiveTab('diagrams')}
           />
           <TabButton
-            label="Links"
+            label='Links'
             active={activeTab === 'links'}
             onPress={() => setActiveTab('links')}
           />
           <TabButton
-            label="Manuals"
+            label='Manuals'
             active={activeTab === 'manuals'}
             onPress={() => setActiveTab('manuals')}
           />

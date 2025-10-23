@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+/** biome-ignore-all lint/correctness/noUnusedVariables: ignored as file does not matter */
 // Storybook v9 native entry for dynamic in-app loading.
 const sb = require('@storybook/react-native')
 
@@ -9,11 +10,12 @@ let generated = null
 try {
   // eslint-disable-next-line global-require, import/no-dynamic-require
   generated = require('./entries')
-} catch (e) {
+} catch (_e) {
   // no-op: fallback to the small hand-written map below
 }
 
 let storyEntries
+// biome-ignore lint/complexity/useOptionalChain: does not matter here
 if (generated && generated.modules) {
   const modules = generated.modules
   function req(k) {

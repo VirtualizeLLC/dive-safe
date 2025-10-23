@@ -1,3 +1,7 @@
+// IMPORTANT: Reanimated must be imported at the very top, before any other imports
+// to properly install its JSI and initialize its logger configuration.
+import 'react-native-reanimated'
+
 import { registerRootComponent } from 'expo'
 import Entry from './app/entry'
 

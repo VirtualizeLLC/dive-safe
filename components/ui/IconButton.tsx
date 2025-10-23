@@ -38,7 +38,7 @@ export const IconButton: React.FC<{
   return (
     <View style={styles.wrapper}>
       {showLabel && label ? (
-        <View style={styles.tooltip} pointerEvents="none">
+        <View style={styles.tooltip} pointerEvents='none'>
           <Text style={styles.tooltipText} numberOfLines={1}>
             {label}
           </Text>
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f2f2f2',
+    backgroundColor: '#fff',
   },
   tooltip: {
     position: 'absolute',

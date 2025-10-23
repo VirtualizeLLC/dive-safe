@@ -10,7 +10,7 @@ const TabButton: React.FC<{
     onPress={onPress}
     style={[styles.tab, active && styles.tabActive]}
     activeOpacity={0.8}
-    accessibilityRole="button"
+    accessibilityRole='button'
   >
     <Text style={[styles.tabText, active && styles.tabTextActive]}>
       {label}
