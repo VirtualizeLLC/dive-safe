@@ -7,6 +7,11 @@ on:
         description: Optional custom suffix to append to the version (defaults to run number)
         required: false
         default: ""
+      buildAAB:
+        description: Build Android App Bundle (AAB) in addition to APK
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -68,6 +73,7 @@ jobs:
         run: yarn build:android:apk
 
       - name: Build Android AAB (release bundle)
+        if: ${{ github.event.inputs.buildAAB == 'true' || github.event.inputs.buildAAB == true }}
         run: yarn build:android:aab
 
       - name: Locate APK/AAB
@@ -90,12 +96,12 @@ jobs:
           name: app-release-apk
           path: ${{ steps.find_outputs.outputs.apk_path }}
 
-      # - name: Upload artifact (AAB)
-      #   if: ${{ steps.find_outputs.outputs.aab_path }}
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: app-release-aab
-      #     path: ${{ steps.find_outputs.outputs.aab_path }}
+      - name: Upload artifact (AAB)
+        if: ${{ (github.event.inputs.buildAAB == 'true' || github.event.inputs.buildAAB == true) && steps.find_outputs.outputs.aab_path != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-aab
+          path: ${{ steps.find_outputs.outputs.aab_path }}
 
       - name: Create GitHub Release and upload APK
         uses: softprops/action-gh-release@v2
@@ -106,6 +112,17 @@ jobs:
           prerelease: true
           files: |
             ${{ steps.find_outputs.outputs.apk_path }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload AAB to GitHub Release (optional)
+        if: ${{ (github.event.inputs.buildAAB == 'true' || github.event.inputs.buildAAB == true) && steps.find_outputs.outputs.aab_path != '' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          draft: false
+          prerelease: true
+          files: |
             ${{ steps.find_outputs.outputs.aab_path }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

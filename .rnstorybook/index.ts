@@ -27,24 +27,24 @@ export const storybookStorage = new MMKV({ id: 'storybook' })
 // const view = start({ annotations: [], storyEntries, options: {} } as any);
 
 const resolveNull = () => {
-	return Promise.resolve(null)
+  return Promise.resolve(null)
 }
 
 let StorybookUIRoot: any = null
 if (view && typeof view.getStorybookUI === 'function') {
-	// cast params to any because the native params type may differ across SB versions
-	StorybookUIRoot = view.getStorybookUI({
-		onDeviceUI: true,
-		storage:
-			storybookStorage === undefined
-				? null
-				: {
-						getItem: storybookStorage
-							? resolveNull
-							: storybookStorage.getString,
-						setItem: storybookStorage ? resolveNull : storybookStorage.set,
-					},
-	} as any)
+  // cast params to any because the native params type may differ across SB versions
+  StorybookUIRoot = view.getStorybookUI({
+    onDeviceUI: true,
+    storage:
+      storybookStorage === undefined
+        ? null
+        : {
+            getItem: storybookStorage
+              ? resolveNull
+              : storybookStorage.getString,
+            setItem: storybookStorage ? resolveNull : storybookStorage.set,
+          },
+  } as any)
 }
 
 console.log('CALLED RN STORYBOOK INDEX')
